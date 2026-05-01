@@ -57,7 +57,7 @@ body.dark .vnum{color:#555;}
 body.dark .vfeedback{border-top-color:#2a2a2a;}
 body.dark .vrevealed{background:#1e1c14;border-top-color:#3a3520;color:#c8c09a;}
 body.dark .vstatus.ok{background:#0b2d1e;color:#5DCAA5;}
-body.dark .vstatus.ng{background:#2d0b0b;color:#e88;}
+body.dark .vstatus.ng{background:#2d1a00;color:#F5A623;}
 body.dark .del{background:#3a1212;color:#e88;text-decoration:line-through;border-radius:3px;padding:0 3px;}
 body.dark .ins{background:#0b2d1e;color:#5DCAA5;border-radius:3px;padding:0 3px;font-weight:500;}
 body.dark .ok-ch{color:#e0e0da;}
@@ -105,7 +105,7 @@ h1{font-size:20px;font-weight:600;flex:1;}
 .eyebtn:active{transform:scale(.97);}
 .vstatus{font-size:12px;padding:3px 8px;border-radius:20px;white-space:nowrap;font-weight:500;}
 .vstatus.ok{background:#E1F5EE;color:#085041;}
-.vstatus.ng{background:#FCEBEB;color:#791F1F;}
+.vstatus.ng{background:#FEF3E2;color:#9A4F00;}
 .vfeedback{padding:10px 14px 14px 48px;font-size:13px;line-height:2.1;display:none;word-break:keep-all;border-top:1px solid;}
 .vfeedback.show{display:block;}
 .vrevealed{padding:10px 14px 12px 48px;font-size:13px;line-height:1.9;display:none;word-break:keep-all;border-top:1px solid;}
@@ -450,7 +450,7 @@ function check(i){
     st.className='vstatus ng';
     // 정확도: 동일한 슬라이싱 방식으로 계산
     const pct=calcPct(val,ans);
-    st.textContent='오답 '+pct+'%';
+    st.textContent='정확도 '+pct+'%';
     fb.className='vfeedback show';
     fb.innerHTML=buildDiff(val,ans);
   }
