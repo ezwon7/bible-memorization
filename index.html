@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>성경 암송 60구절</title>
+<title>포이맨 성경암송 60구절</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Malgun Gothic',sans-serif;padding:1.5rem;transition:background .2s,color .2s;}
@@ -112,6 +112,10 @@ h1{font-size:20px;font-weight:600;flex:1;}
 .vrevealed.show{display:block;}
 .vrevealed strong{font-weight:600;display:block;margin-bottom:2px;}
 .eye-icon{width:16px;height:16px;display:inline-block;vertical-align:middle;}
+.book-header{font-size:13px;font-weight:600;padding:10px 14px 6px 14px;opacity:.6;display:none;}
+.book-header.show{display:block;}
+body.light .book-header{color:#1a1a1a;}
+body.dark .book-header{color:#e0e0da;}
 </style>
 </head>
 <body class="light">
@@ -125,9 +129,11 @@ h1{font-size:20px;font-weight:600;flex:1;}
     </div>
     <div class="ctrl-bar">
       <input type="radio" name="rmode" id="rmSeq" class="ctrl-radio" checked>
-      <label for="rmSeq" class="ctrl-label sel" id="lSeq" onclick="setRandMode(false)">순서</label>
+      <label for="rmSeq" class="ctrl-label sel" id="lSeq" onclick="setSortMode('seq')">순서</label>
+      <input type="radio" name="rmode" id="rmBook" class="ctrl-radio">
+      <label for="rmBook" class="ctrl-label" id="lBook" onclick="setSortMode('book')">권별</label>
       <input type="radio" name="rmode" id="rmRand" class="ctrl-radio">
-      <label for="rmRand" class="ctrl-label" id="lRand" onclick="setRandMode(true)">랜덤</label>
+      <label for="rmRand" class="ctrl-label" id="lRand" onclick="setSortMode('rand')">랜덤</label>
     </div>
     <button class="global-eye" id="globalEye" onclick="toggleAllReveal()">
       <svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
@@ -140,7 +146,7 @@ h1{font-size:20px;font-weight:600;flex:1;}
     <div id="rangeBar" style="display:contents;"></div>
   </div>
 
-  <div class="top"><h1>성경 암송 60구절</h1></div>
+  <div class="top"><h1>포이맨 성경암송 60구절</h1></div>
   <div class="tip">구절+본문 입력 예) <b>에베소서 4:13 우리가 다 하나님의...</b> &nbsp;|&nbsp; 엔터 또는 확인으로 채점 &nbsp;|&nbsp; 띄어쓰기 무시</div>
   <div id="list"></div>
 </div>
@@ -166,7 +172,7 @@ const V=[
 {r:"마태복음 25:40",t:"임금이 대답하여 이르시되 내가 진실로 너희에게 이르노니 너희가 여기 내 형제 중에 지극히 작은 자 하나에게 한 것이 곧 내게 한 것이니라 하시고"},
 {r:"마태복음 28:18-20",t:"예수께서 나아와 말씀하여 이르시되 하늘과 땅의 모든 권세를 내게 주셨으니 그러므로 너희는 가서 모든 민족을 제자로 삼아 아버지와 아들과 성령의 이름으로 세례를 베풀고 내가 너희에게 분부한 모든 것을 가르쳐 지키게 하라 볼지어다 내가 세상 끝날까지 너희와 항상 함께 있으리라 하시니라"},
 {r:"이사야 52:7",t:"좋은 소식을 전하며 평화를 공포하며 복된 좋은 소식을 가져오며 구원을 공포하며 시온을 향하여 이르기를 네 하나님이 통치하신다 하는 자의 산을 넘는 발이 어찌 그리 아름다운가"},
-{r:"예레미야 29:11",t:"여호와의 말씀이니라 너희를 향한 나의 생각을 아나니 평안이요 재앙이 아니니라 너희에게 미래와 희망을 주는 것이니라"},
+{r:"예레미야 29:11",t:"여호와의 말씀이니라 너희를 향한 나의 생각을 내가 아나니 평안이요 재앙이 아니니라 너희에게 미래와 희망을 주는 것이니라"},
 {r:"호세아 6:6",t:"나는 인애를 원하고 제사를 원하지 아니하며 번제보다 하나님을 아는 것을 원하노라"},
 {r:"에베소서 5:8",t:"너희가 전에는 어둠이더니 이제는 주 안에서 빛이라 빛의 자녀들처럼 행하라"},
 {r:"이사야 61:1",t:"주 여호와의 영이 내게 내리셨으니 이는 여호와께서 내게 기름을 부으사 가난한 자에게 아름다운 소식을 전하게 하려 하심이라 나를 보내사 마음이 상한 자를 고치며 포로된 자에게 자유를 갇힌 자에게 놓임을 선포하며"},
@@ -228,6 +234,7 @@ const revealState={};
 let curRange=0;
 let globalRevealOn=false;
 let randMode=false;
+let sortMode='seq';
 
 function strip(s){ return s.replace(/\s/g,''); }
 function full(v){ return v.r+' '+v.t; }
@@ -337,12 +344,19 @@ function setMode(m){
 
 function shuffle(arr){ for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];}return arr; }
 
-function setRandMode(on){
-  randMode=on;
-  document.getElementById('lSeq').className='ctrl-label'+(on?'':' sel');
-  document.getElementById('lRand').className='ctrl-label'+(on?' sel':'');
-  // re-apply current range to reorder
+// 성경 권별 순서 (많은 구절 순)
+function bookOf(ref){ return ref.split(' ')[0]; }
+
+function setSortMode(mode){
+  sortMode=mode;
+  document.getElementById('lSeq').className='ctrl-label'+(mode==='seq'?' sel':'');
+  document.getElementById('lBook').className='ctrl-label'+(mode==='book'?' sel':'');
+  document.getElementById('lRand').className='ctrl-label'+(mode==='rand'?' sel':'');
   setRange(curRange);
+}
+
+function clearBookHeaders(){
+  document.querySelectorAll('.book-header').forEach(el=>el.remove());
 }
 
 function setRange(idx){
@@ -350,7 +364,9 @@ function setRange(idx){
   RANGES.forEach((_,i)=>{ document.getElementById('rbtn'+i).className='rbtn'+(i===idx?' sel':''); });
   const rg=RANGES[idx];
   const list=document.getElementById('list');
-  // get all verse rows in range
+  clearBookHeaders();
+
+  // collect indices in range
   let indices=[];
   V.forEach((_,i)=>{
     const row=document.getElementById('row'+i);
@@ -359,14 +375,39 @@ function setRange(idx){
     row.classList.toggle('hidden',!inRange);
     if(inRange) indices.push(i);
   });
-  // if rand mode, shuffle DOM order of visible rows
-  if(randMode){
+
+  if(sortMode==='rand'){
     shuffle(indices);
-    indices.forEach(i=>{ list.appendChild(document.getElementById('row'+i)); });
+    indices.forEach(i=>list.appendChild(document.getElementById('row'+i)));
+
+  } else if(sortMode==='book'){
+    // group by book, sort groups by count desc, within group keep original order
+    const bookMap={};
+    indices.forEach(i=>{
+      const b=bookOf(V[i].r);
+      if(!bookMap[b]) bookMap[b]=[];
+      bookMap[b].push(i);
+    });
+    // sort books by count desc, ties by first appearance
+    const books=Object.keys(bookMap).sort((a,b)=>{
+      const diff=bookMap[b].length-bookMap[a].length;
+      if(diff!==0) return diff;
+      return bookMap[a][0]-bookMap[b][0];
+    });
+    books.forEach(book=>{
+      // insert book header
+      const hdr=document.createElement('div');
+      hdr.className='book-header show';
+      hdr.textContent=book+' ('+bookMap[book].length+'개)';
+      list.appendChild(hdr);
+      // append rows in original order
+      bookMap[book].sort((a,b)=>a-b).forEach(i=>list.appendChild(document.getElementById('row'+i)));
+    });
+
   } else {
-    // restore sequential order
-    const sorted=[...indices].sort((a,b)=>a-b);
-    sorted.forEach(i=>{ list.appendChild(document.getElementById('row'+i)); });
+    // seq: restore original order
+    indices.sort((a,b)=>a-b);
+    indices.forEach(i=>list.appendChild(document.getElementById('row'+i)));
   }
 }
 
