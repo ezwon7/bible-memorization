@@ -241,86 +241,50 @@ function full(v){ return v.r+' '+v.t; }
 function groupOf(vi){ for(let g=1;g<RANGES.length;g++) if(vi>=RANGES[g].s&&vi<=RANGES[g].e) return g; return 0; }
 
 // 정답 토큰화: 공백으로 쪼갬 (정답은 올바른 단어 경계)
-function tokenizeAns(s){ return s.trim().split(/\s+/).filter(Boolean); }
+// 토큰화: 공백으로 쪼개기 (비교 시 각 토큰 공백 제거해서 비교)
+function tokenize(s){ return s.trim().split(/\s+/).filter(Boolean); }
+// 비교용: 토큰 내 공백 제거
+function norm(t){ return t.replace(/\s/g,''); }
 
-// 입력 재토큰화: 전체 공백 제거 후 정답 토큰 길이 순서대로 슬라이싱
-// → "제 목숨을" → "제목숨을" → ["제","목숨을"] (정답 토큰 길이 기준)
-// 단 중간에 단어 빠진 경우는 LCS로 처리
-function tokenizeInp(inp, ansTokens){
-  const flat = inp.replace(/\s/g,'');
-  // flat을 ansTokens 길이 순서대로 잘라서 inp토큰 배열 생성
-  const tokens=[];
-  let pos=0;
-  for(let i=0;i<ansTokens.length;i++){
-    const len=ansTokens[i].length;
-    if(pos>=flat.length) break;
-    tokens.push(flat.slice(pos, pos+len));
-    pos+=len;
-  }
-  return tokens;
-}
-
-// LCS 역추적 — 매칭된 (inp인덱스, ans인덱스) 쌍 배열 반환
+// LCS 역추적 — norm 기준으로 비교, (inp인덱스, ans인덱스) 쌍 반환
 function lcs(a, b){
+  const na=a.map(norm), nb=b.map(norm);
   const m=a.length, n=b.length;
-  const dp=Array.from({length:m+1},()=>new Array(n+1).fill(0));
+  const dp=Array.from({length:m+1},()=>new Int32Array(n+1));
   for(let i=1;i<=m;i++)
     for(let j=1;j<=n;j++)
-      dp[i][j]=a[i-1]===b[j-1]?dp[i-1][j-1]+1:Math.max(dp[i-1][j],dp[i][j-1]);
+      dp[i][j]=na[i-1]===nb[j-1]?dp[i-1][j-1]+1:Math.max(dp[i-1][j],dp[i][j-1]);
   const pairs=[];
   let i=m,j=n;
   while(i>0&&j>0){
-    if(a[i-1]===b[j-1]){pairs.unshift([i-1,j-1]);i--;j--;}
+    if(na[i-1]===nb[j-1]){pairs.unshift([i-1,j-1]);i--;j--;}
     else if(dp[i-1][j]>dp[i][j-1])i--;
     else j--;
   }
   return pairs;
 }
 
-// diff: 정답 단어 기준으로 입력을 재슬라이싱해서 LCS 매칭
-// → 띄어쓰기 무시 + 중간 단어 빠져도 밀림 없음
+// diff: 입력/정답 모두 공백 기준 토큰화 → LCS 매칭
+// ① 띄어쓰기 무시 (norm 비교) ② 중간 빠진 단어 있어도 밀림 없음
+// ③ 입력이 정답보다 길어도 초과분만 취소선
 function buildDiff(inp, ans){
-  const ansT = tokenizeAns(ans);
-  // 입력 전체 공백 제거 후 정답 단어 길이 순서대로 슬라이싱
-  const flat = inp.replace(/\s/g,'');
-  const ansFlat = ans.replace(/\s/g,'');
-
-  // 입력을 정답 단어 길이 배열로 슬라이싱 → 단어 단위 배열
-  // 단 단어가 빠진 경우를 위해 LCS로 어느 정답 단어에 해당하는지 찾음
-  // 방법: flat 전체를 ansT 각 단어 길이로 잘라서 "입력 토큰 후보" 배열 만들고
-  //       그걸 ansT와 LCS 매칭
-  const inpChunks=[]; // flat을 ansT 길이 순으로 자른 것
-  let pos=0;
-  for(let i=0;i<ansT.length;i++){
-    const len=ansT[i].length;
-    if(pos+len<=flat.length){
-      inpChunks.push(flat.slice(pos,pos+len));
-      pos+=len;
-    } else if(pos<flat.length){
-      inpChunks.push(flat.slice(pos));
-      pos=flat.length;
-    } else {
-      break; // 입력이 짧아서 더 없음
-    }
-  }
-
-  // LCS로 inpChunks와 ansT 매칭 (같은 길이 단어끼리만 비교)
-  const pairs=lcs(inpChunks, ansT);
+  const inpT = tokenize(inp);
+  const ansT = tokenize(ans);
+  const pairs = lcs(inpT, ansT);
 
   let html='';
-  let ai=0, ci=0;
+  let ai=0, ii=0;
   for(let pi=0;pi<=pairs.length;pi++){
     const ansEnd = pi<pairs.length ? pairs[pi][1] : ansT.length;
-    const cEnd   = pi<pairs.length ? pairs[pi][0] : inpChunks.length;
-
+    const inpEnd = pi<pairs.length ? pairs[pi][0] : inpT.length;
     // 빠뜨린 정답 단어 → 초록
     while(ai<ansEnd){ html+='<span class="ins">'+ansT[ai]+'</span> '; ai++; }
-    // 잘못 입력한 단어 → 취소선
-    while(ci<cEnd){ html+='<span class="del">'+inpChunks[ci]+'</span> '; ci++; }
-    // 매칭
+    // 잘못/초과 입력한 단어 → 취소선
+    while(ii<inpEnd){ html+='<span class="del">'+inpT[ii]+'</span> '; ii++; }
+    // 매칭된 단어 → 정답으로 표시
     if(pi<pairs.length){
       html+='<span class="ok-ch">'+ansT[pairs[pi][1]]+'</span> ';
-      ai++; ci++;
+      ai++; ii++;
     }
   }
   return html;
@@ -448,18 +412,8 @@ function check(i){
   } else {
     inp.classList.remove('correct'); inp.classList.add('wrong');
     st.className='vstatus ng';
-    // 정확도: 동일한 방식으로 슬라이싱 후 LCS 매칭 수 / 정답 토큰 수
-    const ansT2=tokenizeAns(ans);
-    const flat2=val.replace(/\s/g,'');
-    const chunks2=[];
-    let pos2=0;
-    for(let k=0;k<ansT2.length;k++){
-      const len=ansT2[k].length;
-      if(pos2+len<=flat2.length){chunks2.push(flat2.slice(pos2,pos2+len));pos2+=len;}
-      else if(pos2<flat2.length){chunks2.push(flat2.slice(pos2));pos2=flat2.length;}
-      else break;
-    }
-    const pct=Math.round(lcs(chunks2,ansT2).length/ansT2.length*100);
+    // 정확도: 입력/정답 토큰화 후 LCS 매칭 수 / 정답 토큰 수
+    const pct=Math.round(lcs(tokenize(val),tokenize(ans)).length/tokenize(ans).length*100);
     st.textContent='오답 '+pct+'%';
     fb.className='vfeedback show';
     fb.innerHTML=buildDiff(val,ans);
