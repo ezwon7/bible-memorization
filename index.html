@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>성경 암송 60구절</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Malgun Gothic',sans-serif;padding:1.5rem;transition:background .2s,color .2s;}
+
+body.light{background:#f5f5f0;color:#1a1a1a;}
+body.light .verse-row{background:#fff;border-color:#e0e0d8;}
+body.light .vinput{background:#fff;color:#1a1a1a;border-color:#ddd;}
+body.light .vinput.correct{background:#E1F5EE;border-color:#1D9E75;}
+body.light .vinput.wrong{background:#fff5f5;border-color:#E24B4A;}
+body.light .vbtn{background:#fff;color:#333;border-color:#ccc;}
+body.light .vbtn:hover{background:#f0f0ec;}
+body.light .eyebtn{background:#fff;color:#555;border-color:#ccc;}
+body.light .eyebtn:hover{background:#f0f0ec;}
+body.light .eyebtn.on{background:#E6F1FB;color:#185FA5;border-color:#85B7EB;}
+body.light .pill{background:#e8e8e2;color:#666;}
+body.light .pill span{color:#1a1a1a;}
+body.light .tip{background:#eee;color:#888;}
+body.light .tip b{color:#333;}
+body.light .vnum{color:#999;}
+body.light .vfeedback{border-top-color:#f0f0ec;}
+body.light .vrevealed{background:#f9f6ee;border-top-color:#e8e0c8;color:#3a3020;}
+body.light .ctrl-bar{background:#e8e8e2;border-color:#d0d0c8;}
+body.light .ctrl-label{color:#666;}
+body.light .ctrl-label.sel{background:#fff;color:#1a1a1a;box-shadow:0 1px 3px rgba(0,0,0,.1);}
+body.light h1{color:#1a1a1a;}
+body.light .del{background:#FCEBEB;color:#c0392b;}
+body.light .ins{background:#E1F5EE;color:#0F6E56;}
+body.light .ok-ch{color:#1a1a1a;}
+body.light .range-bar{background:#e8e8e2;border-color:#d0d0c8;}
+body.light .range-label{color:#666;}
+body.light .range-label.sel{background:#fff;color:#1a1a1a;box-shadow:0 1px 3px rgba(0,0,0,.1);}
+body.light .global-eye{background:#fff;color:#555;border-color:#ccc;}
+body.light .global-eye:hover{background:#f0f0ec;}
+body.light .global-eye.on{background:#E6F1FB;color:#185FA5;border-color:#85B7EB;}
+
+body.dark{background:#181818;color:#e0e0da;}
+body.dark .verse-row{background:#222;border-color:#333;}
+body.dark .vinput{background:#2a2a2a;color:#e0e0da;border-color:#3a3a3a;}
+body.dark .vinput:focus{border-color:#1D9E75;box-shadow:0 0 0 2px rgba(29,158,117,.2);}
+body.dark .vinput.correct{background:#0b2d1e;border-color:#1D9E75;}
+body.dark .vinput.wrong{background:#2d0b0b;border-color:#c0392b;}
+body.dark .vbtn{background:#2a2a2a;color:#bbb;border-color:#3a3a3a;}
+body.dark .vbtn:hover{background:#333;}
+body.dark .eyebtn{background:#2a2a2a;color:#888;border-color:#3a3a3a;}
+body.dark .eyebtn:hover{background:#333;}
+body.dark .eyebtn.on{background:#0c2a42;color:#85B7EB;border-color:#185FA5;}
+body.dark .pill{background:#2a2a2a;color:#888;}
+body.dark .pill span{color:#e0e0da;}
+body.dark .tip{background:#222;color:#777;}
+body.dark .tip b{color:#aaa;}
+body.dark .vnum{color:#555;}
+body.dark .vfeedback{border-top-color:#2a2a2a;}
+body.dark .vrevealed{background:#1e1c14;border-top-color:#3a3520;color:#c8c09a;}
+body.dark .vstatus.ok{background:#0b2d1e;color:#5DCAA5;}
+body.dark .vstatus.ng{background:#2d0b0b;color:#e88;}
+body.dark .del{background:#3a1212;color:#e88;}
+body.dark .ins{background:#0b2d1e;color:#5DCAA5;}
+body.dark .ok-ch{color:#e0e0da;}
+body.dark h1{color:#e0e0da;}
+body.dark .ctrl-bar{background:#222;border-color:#333;}
+body.dark .ctrl-label{color:#666;}
+body.dark .ctrl-label.sel{background:#333;color:#e0e0da;box-shadow:none;}
+body.dark .range-bar{background:#222;border-color:#333;}
+body.dark .range-label{color:#666;}
+body.dark .range-label.sel{background:#333;color:#e0e0da;box-shadow:none;}
+body.dark .global-eye{background:#2a2a2a;color:#888;border-color:#3a3a3a;}
+body.dark .global-eye:hover{background:#333;}
+body.dark .global-eye.on{background:#0c2a42;color:#85B7EB;border-color:#185FA5;}
+
+#wrap{max-width:720px;margin:0 auto;}
+
+.topbar{display:flex;align-items:center;gap:8px;margin-bottom:1rem;flex-wrap:wrap;}
+.ctrl-bar{display:inline-flex;align-items:center;gap:4px;padding:4px;border-radius:10px;border:1px solid;}
+.ctrl-radio{display:none;}
+.ctrl-label{font-size:13px;cursor:pointer;padding:5px 14px;border-radius:7px;transition:background .12s,color .12s;user-select:none;}
+
+.global-eye{font-size:13px;cursor:pointer;padding:5px 12px;border-radius:7px;border:1px solid;transition:background .12s;display:inline-flex;align-items:center;gap:5px;user-select:none;}
+
+.range-bar{display:inline-flex;align-items:center;gap:4px;padding:4px;border-radius:10px;border:1px solid;flex-wrap:wrap;}
+.range-radio{display:none;}
+.range-label{font-size:12px;cursor:pointer;padding:4px 11px;border-radius:7px;transition:background .12s,color .12s;user-select:none;}
+
+.top{display:flex;align-items:center;gap:16px;margin-bottom:1rem;flex-wrap:wrap;}
+h1{font-size:20px;font-weight:600;flex:1;}
+.pills{display:flex;gap:8px;flex-wrap:wrap;}
+.pill{font-size:12px;border-radius:20px;padding:3px 12px;}
+.tip{font-size:12px;border-radius:8px;padding:6px 14px;margin-bottom:1.2rem;}
+
+.verse-row{border-radius:12px;border:1px solid;margin-bottom:10px;overflow:hidden;transition:display .1s;}
+.verse-row.hidden{display:none;}
+.verse-header{display:flex;align-items:center;gap:8px;padding:10px 14px;}
+.vnum{font-size:13px;font-weight:600;min-width:26px;}
+.vinput{flex:1;font-size:14px;padding:7px 10px;border-radius:8px;border:1px solid;font-family:inherit;outline:none;transition:border-color .15s,background .15s;}
+.vbtn{font-size:13px;padding:7px 14px;border-radius:8px;border:1px solid;cursor:pointer;white-space:nowrap;font-family:inherit;transition:background .12s;}
+.vbtn:active{transform:scale(.97);}
+.eyebtn{font-size:13px;padding:7px 10px;border-radius:8px;border:1px solid;cursor:pointer;line-height:1;transition:background .12s;}
+.eyebtn:active{transform:scale(.97);}
+.vstatus{font-size:12px;padding:3px 8px;border-radius:20px;white-space:nowrap;font-weight:500;}
+.vstatus.ok{background:#E1F5EE;color:#085041;}
+.vstatus.ng{background:#FCEBEB;color:#791F1F;}
+
+.vfeedback{padding:8px 14px 12px 48px;font-size:13px;line-height:2;display:none;word-break:keep-all;border-top:1px solid;}
+.vfeedback.show{display:block;}
+.vrevealed{padding:10px 14px 12px 48px;font-size:13px;line-height:1.9;display:none;word-break:keep-all;border-top:1px solid;}
+.vrevealed.show{display:block;}
+.vrevealed strong{font-weight:600;display:block;margin-bottom:2px;}
+
+.del{text-decoration:line-through;border-radius:3px;padding:0 1px;}
+.ins{border-radius:3px;padding:0 1px;font-weight:500;}
+
+/* eye svg icon */
+.eye-icon{width:16px;height:16px;display:inline-block;vertical-align:middle;}
+</style>
+</head>
+<body class="light">
+<div id="wrap">
+
+  <div class="topbar">
+    <!-- 라이트/다크 -->
+    <div class="ctrl-bar" id="modeBar">
+      <input type="radio" name="mode" id="mLight" class="ctrl-radio" checked>
+      <label for="mLight" class="ctrl-label sel" id="lLight" onclick="setMode('light')">라이트</label>
+      <input type="radio" name="mode" id="mDark" class="ctrl-radio">
+      <label for="mDark" class="ctrl-label" id="lDark" onclick="setMode('dark')">다크</label>
+    </div>
+    <!-- 전체 eye 버튼 -->
+    <button class="global-eye" id="globalEye" onclick="toggleAllReveal()">
+      <svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+      전체 보기
+    </button>
+  </div>
+
+  <!-- 구간 필터 -->
+  <div class="range-bar" id="rangeBar" style="margin-bottom:1rem;">
+    <input type="radio" name="range" id="rAll" class="range-radio" checked>
+    <label for="rAll" class="range-label sel" id="lrAll" onclick="setRange(-1)">전체</label>
+    <input type="radio" name="range" id="r1" class="range-radio">
+    <label for="r1" class="range-label" id="lr1" onclick="setRange(0)">1-10</label>
+    <input type="radio" name="range" id="r2" class="range-radio">
+    <label for="r2" class="range-label" id="lr2" onclick="setRange(1)">11-20</label>
+    <input type="radio" name="range" id="r3" class="range-radio">
+    <label for="r3" class="range-label" id="lr3" onclick="setRange(2)">21-30</label>
+    <input type="radio" name="range" id="r4" class="range-radio">
+    <label for="r4" class="range-label" id="lr4" onclick="setRange(3)">31-40</label>
+    <input type="radio" name="range" id="r5" class="range-radio">
+    <label for="r5" class="range-label" id="lr5" onclick="setRange(4)">41-50</label>
+    <input type="radio" name="range" id="r6" class="range-radio">
+    <label for="r6" class="range-label" id="lr6" onclick="setRange(5)">51-60</label>
+  </div>
+
+  <div class="top">
+    <h1>성경 암송 60구절</h1>
+    <div class="pills">
+      <div class="pill">완료: <span id="sc">0</span>/60</div>
+      <div class="pill">시도: <span id="sa">0</span></div>
+    </div>
+  </div>
+  <div class="tip">구절+본문 입력 예) <b>에베소서 4:13 우리가 다 하나님의...</b> &nbsp;|&nbsp; 엔터 또는 확인으로 채점 &nbsp;|&nbsp; 띄어쓰기 무시</div>
+  <div id="list"></div>
+</div>
+
+<script>
+const V=[
+{r:"에베소서 4:13",t:"우리가 다 하나님의 아들을 믿는 것과 아는 일에 하나가 되어 온전한 사람을 이루어 그리스도의 장성한 분량이 충만한 데까지 이르리니"},
+{r:"마태복음 4:19",t:"말씀하시되 나를 따라오라 내가 너희를 사람을 낚는 어부가 되게 하리라 하시니"},
+{r:"마태복음 5:16",t:"이같이 너희 빛이 사람 앞에 비치게 하여 그들로 너희 착한 행실을 보고 하늘에 계신 너희 아버지께 영광을 돌리게 하라"},
+{r:"마태복음 6:33",t:"그런즉 너희는 먼저 그의 나라와 그의 의를 구하라 그리하면 이 모든 것을 너희에게 더하시리라"},
+{r:"마태복음 9:35",t:"예수께서 모든 도시와 마을에 두루 다니사 그들의 회당에서 가르치시며 천국 복음을 전파하시며 모든 병과 모든 약한 것을 고치시니라"},
+{r:"마태복음 10:16",t:"보라 내가 너희를 보냄이 양을 이리 가운데로 보냄과 같도다 그러므로 너희는 뱀 같이 지혜롭고 비둘기 같이 순결하라"},
+{r:"마태복음 10:32-33",t:"누구든지 사람 앞에서 나를 시인하면 나도 하늘에 계신 내 아버지 앞에서 그를 시인할 것이요 누구든지 사람 앞에서 나를 부인하면 나도 하늘에 계신 내 아버지 앞에서 그를 부인하리라"},
+{r:"마태복음 11:29-30",t:"나는 마음이 온유하고 겸손하니 나의 멍에를 메고 내게 배우라 그리하면 너희 마음이 쉼을 얻으리니 이는 내 멍에는 쉽고 내 짐은 가벼움이라 하시니라"},
+{r:"마태복음 14:23",t:"무리를 보내신 후에 기도하러 따로 산에 올라가시니라 저물매 거기 혼자 계시더니"},
+{r:"마태복음 16:19",t:"내가 천국 열쇠를 네게 주리니 네가 땅에서 무엇이든지 매면 하늘에서도 매일 것이요 네가 땅에서 무엇이든지 풀면 하늘에서도 풀리리라 하시고"},
+{r:"마태복음 16:24-25",t:"이에 예수께서 제자들에게 이르시되 누구든지 나를 따라오려거든 자기를 부인하고 자기 십자가를 지고 나를 따를 것이니라 누구든지 제 목숨을 구원하고자 하면 잃을 것이요 누구든지 나를 위하여 제 목숨을 잃으면 찾으리라"},
+{r:"마태복음 18:19",t:"진실로 다시 너희에게 이르노니 너희 중의 두 사람이 땅에서 합심하여 무엇이든지 구하면 하늘에 계신 내 아버지께서 그들을 위하여 이루게 하시리라"},
+{r:"마태복음 19:26",t:"예수께서 그들을 보시며 이르시되 사람으로는 할 수 없으나 하나님으로서는 다 하실 수 있느니라"},
+{r:"마태복음 20:28",t:"인자가 온 것은 섬김을 받으려 함이 아니라 도리어 섬기려 하고 자기 목숨을 많은 사람의 대속물로 주려 함이니라"},
+{r:"마태복음 21:22",t:"너희가 기도할 때에 무엇이든지 믿고 구하는 것은 다 받으리라 하시니라"},
+{r:"마태복음 24:45",t:"충성되고 지혜 있는 종이 되어 주인에게 그 집 사람들을 맡아 때를 따라 양식을 나눠줄 자가 누구냐"},
+{r:"마태복음 25:40",t:"임금이 대답하여 이르시되 내가 진실로 너희에게 이르노니 너희가 여기 내 형제 중에 지극히 작은 자 하나에게 한 것이 곧 내게 한 것이니라 하시고"},
+{r:"마태복음 28:18-20",t:"예수께서 나아와 말씀하여 이르시되 하늘과 땅의 모든 권세를 내게 주셨으니 그러므로 너희는 가서 모든 민족을 제자로 삼아 아버지와 아들과 성령의 이름으로 세례를 베풀고 내가 너희에게 분부한 모든 것을 가르쳐 지키게 하라 볼지어다 내가 세상 끝날까지 너희와 항상 함께 있으리라 하시니라"},
+{r:"이사야 52:7",t:"좋은 소식을 전하며 평화를 공포하며 복된 좋은 소식을 가져오며 구원을 공포하며 시온을 향하여 이르기를 네 하나님이 통치하신다 하는 자의 산을 넘는 발이 어찌 그리 아름다운가"},
+{r:"예레미야 29:11",t:"여호와의 말씀이니라 너희를 향한 나의 생각을 아나니 평안이요 재앙이 아니니라 너희에게 미래와 희망을 주는 것이니라"},
+{r:"호세아 6:6",t:"나는 인애를 원하고 제사를 원하지 아니하며 번제보다 하나님을 아는 것을 원하노라"},
+{r:"에베소서 5:8",t:"너희가 전에는 어둠이더니 이제는 주 안에서 빛이라 빛의 자녀들처럼 행하라"},
+{r:"이사야 61:1",t:"주 여호와의 영이 내게 내리셨으니 이는 여호와께서 내게 기름을 부으사 가난한 자에게 아름다운 소식을 전하게 하려 하심이라 나를 보내사 마음이 상한 자를 고치며 포로된 자에게 자유를 갇힌 자에게 놓임을 선포하며"},
+{r:"에베소서 6:12",t:"우리의 씨름은 혈과 육을 상대하는 것이 아니요 통치자들과 권세들과 이 어둠의 세상 주관자들과 하늘에 있는 악의 영들을 상대함이라"},
+{r:"이사야 26:3",t:"주께서 심지가 견고한 자를 평강하고 평강하도록 지키시리니 이는 그가 주를 신뢰함이니이다"},
+{r:"에베소서 4:29",t:"무릇 더러운 말은 너희 입 밖에도 내지 말고 오직 덕을 세우는 데 소용되는 대로 선한 말을 하여 듣는 자들에게 은혜를 끼치게 하라"},
+{r:"고린도전서 10:31",t:"그런즉 너희가 먹든지 마시든지 무엇을 하든지 다 하나님의 영광을 위하여 하라"},
+{r:"시편 46:10",t:"이르시기를 너희는 가만히 있어 내가 하나님 됨을 알지어다 내가 뭇 나라 중에서 높임을 받으리라 내가 세계 중에서 높임을 받으리라 하시도다"},
+{r:"시편 27:1",t:"여호와는 나의 빛이요 나의 구원이시니 내가 누구를 두려워하리요 여호와는 내 생명의 능력이시니 내가 누구를 무서워하리요"},
+{r:"고린도전서 4:20",t:"하나님의 나라는 말에 있지 아니하고 오직 능력에 있음이라"},
+{r:"이사야 40:31",t:"오직 여호와를 앙망하는 자는 새 힘을 얻으리니 독수리가 날개치며 올라감 같을 것이요 달음박질하여도 곤비하지 아니하겠고 걸어가도 피곤하지 아니하리로다"},
+{r:"야고보서 4:7",t:"그런즉 너희는 하나님께 복종할지어다 마귀를 대적하라 그리하면 너희를 피하리라"},
+{r:"잠언 13:20",t:"지혜로운 자와 동행하면 지혜를 얻고 미련한 자와 사귀면 해를 받느니라"},
+{r:"고린도전서 1:18",t:"십자가의 도가 멸망하는 자들에게는 미련한 것이요 구원을 받는 우리에게는 하나님의 능력이라"},
+{r:"요한복음 16:33",t:"이것을 너희에게 이르는 것은 너희로 내 안에서 평안을 누리게 하려 함이라 세상에서는 너희가 환난을 당하나 담대하라 내가 세상을 이기었노라"},
+{r:"고린도후서 5:7",t:"이는 우리가 믿음으로 행하고 보는 것으로 행하지 아니함이로라"},
+{r:"이사야 60:1",t:"일어나라 빛을 발하라 이는 네 빛이 이르렀고 여호와의 영광이 네 위에 임하였음이니라"},
+{r:"히브리서 4:12",t:"하나님의 말씀은 살아 있고 활력이 있어 좌우에 날선 어떤 검보다도 예리하여 혼과 영과 및 관절과 골수를 찔러 쪼개기까지 하며 또 마음의 생각과 뜻을 판단하나니"},
+{r:"빌립보서 2:3-4",t:"아무 일에든지 다툼이나 허영으로 하지 말고 오직 겸손한 마음으로 각각 자기보다 남을 낫게 여기고 각각 자기 일을 돌볼 뿐더러 또한 각각 다른 사람들의 일을 돌보아 나의 기쁨을 충만하게 하라"},
+{r:"요한일서 5:18",t:"하나님께로부터 난 자는 다 범죄하지 아니하는 줄을 우리가 아노라 하나님께로부터 나신 자가 그를 지키시매 악한 자가 그를 만지지도 못하느니라"},
+{r:"요한복음 13:34-35",t:"새 계명을 너희에게 주노니 서로 사랑하라 내가 너희를 사랑한 것 같이 너희도 서로 사랑하라 너희가 서로 사랑하면 이로써 모든 사람이 너희가 내 제자인 줄 알리라"},
+{r:"베드로전서 4:11",t:"만일 누가 말하려면 하나님의 말씀을 하는 것 같이 하고 누가 봉사하려면 하나님이 공급하시는 힘으로 하는 것 같이 하라"},
+{r:"갈라디아서 5:22-23",t:"오직 성령의 열매는 사랑과 희락과 화평과 오래 참음과 자비와 양선과 충성과 온유와 절제니 이같은 것을 금지할 법이 없느니라"},
+{r:"데살로니가전서 4:16-17",t:"주께서 호령과 천사장의 소리와 하나님의 나팔 소리로 친히 하늘로부터 강림하시리니 그리스도 안에서 죽은 자들이 먼저 일어나고 그 후에 우리 살아 남은 자들도 그들과 함께 구름 속으로 끌어 올려 공중에서 주를 영접하게 하시리니 그리하여 우리가 항상 주와 함께 있으리라"},
+{r:"디모데후서 2:2",t:"또 네가 많은 증인 앞에서 내게 들은 바를 충성된 사람들에게 부탁하라 그들이 또 다른 사람들을 가르칠 수 있으리라"},
+{r:"로마서 14:7-8",t:"우리 중에 누구든지 자기를 위하여 사는 자가 없고 자기를 위하여 죽는 자도 없도다 우리가 살아도 주를 위하여 살고 죽어도 주를 위하여 죽나니 그러므로 사나 죽으나 우리가 주의 것이로다"},
+{r:"에베소서 6:10-11",t:"끝으로 너희가 주 안에서와 그 힘의 능력으로 강건하여지고 마귀의 간계를 능히 대적하기 위하여 하나님의 전신갑주를 입으라"},
+{r:"에베소서 5:15-16",t:"그런즉 너희가 어떻게 행할지를 자세히 주의하여 지혜 없는 자 같이 하지 말고 오직 지혜 있는 자 같이 하여 세월을 아끼라 때가 악하니라"},
+{r:"로마서 8:28",t:"우리가 알거니와 하나님을 사랑하는 자 곧 그의 뜻대로 부르심을 입은 자들에게는 모든 것이 합력하여 선을 이루느니라"},
+{r:"디모데전서 6:17",t:"네가 이 세대에서 부한 자들을 명하여 마음을 높이지 말고 정함이 없는 재물에 소망을 두지 말고 오직 우리에게 모든 것을 후히 주사 누리게 하시는 하나님께 두며"},
+{r:"잠언 15:23",t:"사람은 그 입의 대답으로 말미암아 기쁨을 얻나니 때에 맞는 말이 얼마나 아름다운고"},
+{r:"고린도전서 6:19-20",t:"너희 몸은 너희가 하나님께로부터 받은 바 너희 가운데 계신 성령의 전인 줄을 알지 못하느냐 너희는 너희 자신의 것이 아니라 값으로 산 것이 되었으니 그런즉 너희 몸으로 하나님께 영광을 돌리라"},
+{r:"누가복음 6:45",t:"선한 사람은 마음에 쌓은 선에서 선을 내고 악한 자는 그 쌓은 악에서 악을 내나니 이는 마음에 가득한 것을 입으로 말함이니라"},
+{r:"요한복음 14:21",t:"나의 계명을 지키는 자라야 나를 사랑하는 자니 나를 사랑하는 자는 내 아버지께 사랑을 받을 것이요 나도 그를 사랑하여 그에게 나를 나타내리라"},
+{r:"에베소서 2:8-9",t:"너희는 그 은혜에 의하여 믿음으로 말미암아 구원을 받았으니 이것은 너희에게서 난 것이 아니요 하나님의 선물이라 행위에서 난 것이 아니니 이는 누구든지 자랑하지 못하게 함이라"},
+{r:"갈라디아서 2:20",t:"내가 그리스도와 함께 십자가에 못 박혔나니 그런즉 이제는 내가 사는 것이 아니요 오직 내 안에 그리스도께서 사시는 것이라 이제 내가 육체 가운데 사는 것은 나를 사랑하사 나를 위하여 자기 자신을 버리신 하나님의 아들을 믿는 믿음 안에서 사는 것이라"},
+{r:"요한복음 1:1",t:"태초에 말씀이 계시니라 이 말씀이 하나님과 함께 계셨으니 이 말씀은 곧 하나님이시니라"},
+{r:"여호수아 1:8",t:"이 율법책을 네 입에서 떠나지 말게 하며 주야로 그것을 묵상하여 그 안에 기록된 대로 다 지켜 행하라 그리하면 네 길이 평탄하게 될 것이며 네가 형통하리라"},
+{r:"시편 1편",t:"복 있는 사람은 악인들의 꾀를 따르지 아니하며 죄인들의 길에 서지 아니하며 오만한 자들의 자리에 앉지 아니하고 오직 여호와의 율법을 즐거워하여 그의 율법을 주야로 묵상하는도다 그는 시냇가에 심은 나무가 철을 따라 열매를 맺으며 그 잎사귀가 마르지 아니함 같으니 그가 하는 모든 일이 다 형통하리로다 악인들은 그렇지 아니함이여 오직 바람에 나는 겨와 같도다 그러므로 악인들은 심판을 견디지 못하며 죄인들이 의인들의 모임에 들지 못하리로다 무릇 의인들의 길은 여호와께서 인정하시나 악인들의 길은 망하리로다"},
+{r:"시편 23편",t:"여호와는 나의 목자시니 내게 부족함이 없으리로다 그가 나를 푸른 풀밭에 누이시며 쉴 만한 물가로 인도하시는도다 내 영혼을 소생시키시고 자기 이름을 위하여 의의 길로 인도하시는도다 내가 사망의 음침한 골짜기로 다닐지라도 해를 두려워하지 않을 것은 주께서 나와 함께 하심이라 주의 지팡이와 막대기가 나를 안위하시나이다 주께서 내 원수의 목전에서 내게 상을 차려 주시고 기름을 내 머리에 부으셨으니 내 잔이 넘치나이다 내 평생에 선하심과 인자하심이 반드시 나를 따르리니 내가 여호와의 집에 영원히 살리로다"}
+];
+
+const eyeSVG='<svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
+const eyeOffSVG='<svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>';
+
+const stats={done:new Set(),attempts:0};
+let currentRange=-1;
+let globalRevealOn=false;
+const revealState={};
+
+function strip(s){return s.replace(/\s/g,'');}
+function full(v){return v.r+' '+v.t;}
+
+function setMode(m){
+  document.body.className=m;
+  document.getElementById('lLight').className='ctrl-label'+(m==='light'?' sel':'');
+  document.getElementById('lDark').className='ctrl-label'+(m==='dark'?' sel':'');
+}
+
+function setRange(r){
+  currentRange=r;
+  const labels=['lrAll','lr1','lr2','lr3','lr4','lr5','lr6'];
+  labels.forEach((id,i)=>{
+    document.getElementById(id).className='range-label'+(i===(r+1)?' sel':'');
+  });
+  V.forEach((_,i)=>{
+    const row=document.getElementById('row'+i);
+    if(!row)return;
+    if(r===-1){row.classList.remove('hidden');}
+    else{
+      const inRange=(i>=r*10 && i<(r+1)*10);
+      row.classList.toggle('hidden',!inRange);
+    }
+  });
+}
+
+function toggleAllReveal(){
+  globalRevealOn=!globalRevealOn;
+  const btn=document.getElementById('globalEye');
+  btn.classList.toggle('on',globalRevealOn);
+  btn.innerHTML=(globalRevealOn?eyeOffSVG:eyeSVG)+(globalRevealOn?' 전체 닫기':' 전체 보기');
+  V.forEach((_,i)=>{
+    setReveal(i,globalRevealOn,true);
+  });
+}
+
+function setReveal(i,on,fromGlobal){
+  revealState[i]=on;
+  const rv=document.getElementById('rv'+i);
+  const eb=document.getElementById('eb'+i);
+  if(!rv||!eb)return;
+  rv.className='vrevealed'+(on?' show':'');
+  eb.classList.toggle('on',on);
+  eb.innerHTML=on?eyeOffSVG:eyeSVG;
+}
+
+function toggleReveal(i){
+  setReveal(i,!revealState[i],false);
+  // if all are on/off, sync global eye
+  const allOn=V.every((_,j)=>revealState[j]);
+  const allOff=V.every((_,j)=>!revealState[j]);
+  if(allOn&&!globalRevealOn){globalRevealOn=true;syncGlobalBtn();}
+  else if(allOff&&globalRevealOn){globalRevealOn=false;syncGlobalBtn();}
+}
+
+function syncGlobalBtn(){
+  const btn=document.getElementById('globalEye');
+  btn.classList.toggle('on',globalRevealOn);
+  btn.innerHTML=(globalRevealOn?eyeOffSVG:eyeSVG)+(globalRevealOn?' 전체 닫기':' 전체 보기');
+}
+
+function buildDiff(inp,ans){
+  const ic=strip(inp).split('');
+  const ac=strip(ans).split('');
+  let html='',ci=0;
+  for(let i=0;i<ans.length;i++){
+    const ch=ans[i];
+    if(ch===' '){html+=' ';continue;}
+    const a=ac[ci],b=ic[ci];
+    if(b===undefined){html+='<span class="ins">'+a+'</span>';}
+    else if(a===b){html+='<span class="ok-ch">'+a+'</span>';}
+    else{html+='<span class="del">'+b+'</span><span class="ins">'+a+'</span>';}
+    ci++;
+  }
+  while(ci<ic.length){html+='<span class="del">'+ic[ci]+'</span>';ci++;}
+  return html;
+}
+
+function check(i){
+  const inp=document.getElementById('inp'+i);
+  const fb=document.getElementById('fb'+i);
+  const st=document.getElementById('st'+i);
+  const val=inp.value;
+  if(!val.trim())return;
+  const ans=full(V[i]);
+  stats.attempts++;
+  document.getElementById('sa').textContent=stats.attempts;
+  if(strip(val)===strip(ans)){
+    inp.classList.remove('wrong');inp.classList.add('correct');
+    st.className='vstatus ok';st.textContent='정답';
+    fb.className='vfeedback';fb.innerHTML='';
+    stats.done.add(i);
+    document.getElementById('sc').textContent=stats.done.size;
+  } else {
+    inp.classList.remove('correct');inp.classList.add('wrong');
+    st.className='vstatus ng';
+    const ic=strip(val).split(''),ac=strip(ans).split('');
+    const matched=ac.filter((c,j)=>ic[j]===c).length;
+    const pct=Math.round(matched/ac.length*100);
+    st.textContent='오답 '+pct+'%';
+    fb.className='vfeedback show';
+    fb.innerHTML=buildDiff(val,ans);
+  }
+}
+
+function buildRows(){
+  const list=document.getElementById('list');
+  V.forEach((v,i)=>{
+    revealState[i]=false;
+    const row=document.createElement('div');
+    row.className='verse-row';
+    row.id='row'+i;
+    row.innerHTML=
+      '<div class="verse-header">'+
+        '<span class="vnum">'+(i+1)+'</span>'+
+        '<input class="vinput" id="inp'+i+'" type="text" placeholder="구절과 본문 입력..." />'+
+        '<button class="vbtn" onclick="check('+i+')">확인</button>'+
+        '<button class="eyebtn" id="eb'+i+'" onclick="toggleReveal('+i+')" title="구절 보기">'+eyeSVG+'</button>'+
+        '<span class="vstatus" id="st'+i+'"></span>'+
+      '</div>'+
+      '<div class="vfeedback" id="fb'+i+'"></div>'+
+      '<div class="vrevealed" id="rv'+i+'"><strong>'+v.r+'</strong>'+v.t+'</div>';
+    list.appendChild(row);
+    document.getElementById('inp'+i).addEventListener('keydown',function(e){
+      if(e.key==='Enter'){e.preventDefault();check(i);}
+    });
+  });
+}
+buildRows();
+</script>
+</body>
+</html>
