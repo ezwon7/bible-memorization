@@ -241,53 +241,89 @@ function full(v){ return v.r+' '+v.t; }
 function groupOf(vi){ for(let g=1;g<RANGES.length;g++) if(vi>=RANGES[g].s&&vi<=RANGES[g].e) return g; return 0; }
 
 // 정답 토큰화: 공백으로 쪼갬 (정답은 올바른 단어 경계)
-// 토큰화: 공백으로 쪼개기 (비교 시 각 토큰 공백 제거해서 비교)
-function tokenize(s){ return s.trim().split(/\s+/).filter(Boolean); }
-// 비교용: 토큰 내 공백 제거
-function norm(t){ return t.replace(/\s/g,''); }
+// ============================================================
+// 띄어쓰기 완전 무시 + 중간 빠진 단어 밀림 없음 + 초과 입력 처리
+// 방법: 입력/정답 모두 공백 제거 → 글자 단위 LCS → 정답 단어 경계로 묶어서 표시
+// ============================================================
 
-// LCS 역추적 — norm 기준으로 비교, (inp인덱스, ans인덱스) 쌍 반환
-function lcs(a, b){
-  const na=a.map(norm), nb=b.map(norm);
-  const m=a.length, n=b.length;
-  const dp=Array.from({length:m+1},()=>new Int32Array(n+1));
+function buildDiff(inp, ans){
+  const A = inp.replace(/\s/g,'');   // 입력 flat (공백 완전 제거)
+  const B = ans.replace(/\s/g,'');   // 정답 flat
+  const m = A.length, n = B.length;
+
+  // 글자 단위 LCS DP
+  const dp = Array.from({length:m+1}, ()=>new Uint16Array(n+1));
   for(let i=1;i<=m;i++)
     for(let j=1;j<=n;j++)
-      dp[i][j]=na[i-1]===nb[j-1]?dp[i-1][j-1]+1:Math.max(dp[i-1][j],dp[i][j-1]);
-  const pairs=[];
+      dp[i][j]=A[i-1]===B[j-1]?dp[i-1][j-1]+1:Math.max(dp[i-1][j],dp[i][j-1]);
+
+  // LCS 역추적 → A와 B에서 매칭된 인덱스 쌍
+  const pairsA=new Int32Array(m).fill(-1); // pairsA[ai] = bi
+  const pairsB=new Int32Array(n).fill(-1); // pairsB[bi] = ai
   let i=m,j=n;
   while(i>0&&j>0){
-    if(na[i-1]===nb[j-1]){pairs.unshift([i-1,j-1]);i--;j--;}
+    if(A[i-1]===B[j-1]){pairsA[i-1]=j-1;pairsB[j-1]=i-1;i--;j--;}
     else if(dp[i-1][j]>dp[i][j-1])i--;
     else j--;
   }
-  return pairs;
-}
 
-// diff: 입력/정답 모두 공백 기준 토큰화 → LCS 매칭
-// ① 띄어쓰기 무시 (norm 비교) ② 중간 빠진 단어 있어도 밀림 없음
-// ③ 입력이 정답보다 길어도 초과분만 취소선
-function buildDiff(inp, ans){
-  const inpT = tokenize(inp);
-  const ansT = tokenize(ans);
-  const pairs = lcs(inpT, ansT);
+  // 정답 단어 경계로 묶어서 표시
+  // 각 단어: 모든 글자가 매칭 → ok / 전체 없음 → ins(초록) / 일부틀림 → del+ins
+  // del에는 실제 입력한 글자를 보여줌 (입력 A에서 해당 B 위치에 매칭된 글자 기준)
+  const ansWords = ans.trim().split(/\s+/).filter(Boolean);
+  let bPos=0, html='';
 
-  let html='';
-  let ai=0, ii=0;
-  for(let pi=0;pi<=pairs.length;pi++){
-    const ansEnd = pi<pairs.length ? pairs[pi][1] : ansT.length;
-    const inpEnd = pi<pairs.length ? pairs[pi][0] : inpT.length;
-    // 빠뜨린 정답 단어 → 초록
-    while(ai<ansEnd){ html+='<span class="ins">'+ansT[ai]+'</span> '; ai++; }
-    // 잘못/초과 입력한 단어 → 취소선
-    while(ii<inpEnd){ html+='<span class="del">'+inpT[ii]+'</span> '; ii++; }
-    // 매칭된 단어 → 정답으로 표시
-    if(pi<pairs.length){
-      html+='<span class="ok-ch">'+ansT[pairs[pi][1]]+'</span> ';
-      ai++; ii++;
+  for(const word of ansWords){
+    const wFlat=word.replace(/\s/g,'');
+    const wLen=wFlat.length;
+    const bEnd=bPos+wLen;
+
+    // 이 단어 범위 [bPos, bEnd)에서 매칭된 A 글자들 수집
+    let matchCount=0;
+    let inpWord=''; // 입력에서 이 단어에 해당하는 글자들
+    for(let b=bPos;b<bEnd&&b<n;b++){
+      if(pairsB[b]>=0){ matchCount++; inpWord+=A[pairsB[b]]; }
     }
+    const totalInWord=Math.min(wLen,n-bPos);
+
+    if(bEnd>n){
+      // 입력이 짧아서 이 단어 글자 전체가 없음
+      html+='<span class="ins">'+wFlat+'</span> ';
+    } else if(matchCount===wLen){
+      // 완전 일치
+      html+='<span class="ok-ch">'+wFlat+'</span> ';
+    } else if(matchCount===0){
+      // 이 단어의 글자가 하나도 안 맞음 → 빠진 것
+      html+='<span class="ins">'+wFlat+'</span> ';
+    } else {
+      // 일부 맞고 일부 틀림
+      // 입력에서 이 단어 위치에 해당하는 실제 입력값 = A의 해당 범위 슬라이스
+      // (첫 매칭 ai ~ 마지막 매칭 ai 사이)
+      const firstAi=pairsB[bPos]>=0?pairsB[bPos]:(pairsB.slice(bPos,bEnd).find(v=>v>=0)??-1);
+      const lastAi=pairsB[bEnd-1]>=0?pairsB[bEnd-1]+1:((()=>{for(let b=bEnd-1;b>=bPos;b--)if(pairsB[b]>=0)return pairsB[b]+1;return -1;})());
+      const inpSlice=(firstAi>=0&&lastAi>firstAi)?A.slice(firstAi,lastAi):wFlat;
+      html+='<span class="del">'+inpSlice+'</span><span class="ins">'+wFlat+'</span> ';
+    }
+    bPos=bEnd;
+  }
+
+  // 입력이 정답보다 길어서 남은 글자 → 취소선
+  const lastMatchedA=pairsA.reduceRight((acc,v,i)=>acc===-1&&v>=0?i:acc,-1);
+  if(lastMatchedA>=0 && lastMatchedA+1<m){
+    html+='<span class="del">'+A.slice(lastMatchedA+1)+'</span>';
   }
   return html;
+}
+
+// 정확도: 공백제거 후 글자 단위 LCS 매칭 수 / 정답 글자 수
+function calcPct(inp, ans){
+  const A=inp.replace(/\s/g,''), B=ans.replace(/\s/g,'');
+  const m=A.length, n=B.length;
+  const dp=Array.from({length:m+1},()=>new Uint16Array(n+1));
+  for(let i=1;i<=m;i++)
+    for(let j=1;j<=n;j++)
+      dp[i][j]=A[i-1]===B[j-1]?dp[i-1][j-1]+1:Math.max(dp[i-1][j],dp[i][j-1]);
+  return Math.round(dp[m][n]/n*100);
 }
 
 function updateBtn(idx){
@@ -412,8 +448,8 @@ function check(i){
   } else {
     inp.classList.remove('correct'); inp.classList.add('wrong');
     st.className='vstatus ng';
-    // 정확도: 입력/정답 토큰화 후 LCS 매칭 수 / 정답 토큰 수
-    const pct=Math.round(lcs(tokenize(val),tokenize(ans)).length/tokenize(ans).length*100);
+    // 정확도: 동일한 슬라이싱 방식으로 계산
+    const pct=calcPct(val,ans);
     st.textContent='오답 '+pct+'%';
     fb.className='vfeedback show';
     fb.innerHTML=buildDiff(val,ans);
