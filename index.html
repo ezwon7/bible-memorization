@@ -139,6 +139,10 @@ body.dark .book-header{color:#e0e0da;}
       <svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
       전체 보기
     </button>
+    <button class="global-eye" id="resetBtn" onclick="resetInputs()" style="margin-left:auto;" title="입력칸만 초기화 (완료/시도 기록 유지)">
+      <svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+      다시 쓰기
+    </button>
   </div>
 
   <div class="range-bar" style="margin-bottom:1.2rem;display:flex;align-items:center;gap:4px;flex-wrap:wrap;">
@@ -454,6 +458,19 @@ function check(i){
     fb.className='vfeedback show';
     fb.innerHTML=buildDiff(val,ans);
   }
+}
+
+function resetInputs(){
+  V.forEach((_,i)=>{
+    const inp=document.getElementById('inp'+i);
+    const fb=document.getElementById('fb'+i);
+    const st=document.getElementById('st'+i);
+    if(!inp) return;
+    inp.value='';
+    inp.classList.remove('correct','wrong');
+    if(fb){fb.className='vfeedback';fb.innerHTML='';}
+    if(st){st.className='vstatus';st.textContent='';}
+  });
 }
 
 function buildRangeBar(){
