@@ -482,6 +482,8 @@ function resetRow(i){
   inp.classList.remove('correct','wrong');
   if(fb){fb.className='vfeedback';fb.innerHTML='';}
   if(st){st.className='vstatus';st.textContent='';}
+  // 구절 보기 창도 닫기
+  setReveal(i,false);
   inp.focus();
 }
 
@@ -495,7 +497,13 @@ function resetInputs(){
     inp.classList.remove('correct','wrong');
     if(fb){fb.className='vfeedback';fb.innerHTML='';}
     if(st){st.className='vstatus';st.textContent='';}
+    // 구절 보기 창도 닫기
+    setReveal(i,false);
   });
+  // 전체보기 버튼 상태도 리셋
+  globalRevealOn=false;
+  const btn=document.getElementById('globalEye');
+  if(btn){btn.classList.remove('on');btn.innerHTML=eyeOn+' 전체 보기';}
 }
 
 // 음성 인식 (Web Speech API - 한국어)
