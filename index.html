@@ -103,6 +103,14 @@ h1{font-size:20px;font-weight:600;flex:1;}
 .vbtn:active{transform:scale(.97);}
 .eyebtn{font-size:13px;padding:7px 10px;border-radius:8px;border:1px solid;cursor:pointer;line-height:1;transition:background .12s;}
 .eyebtn:active{transform:scale(.97);}
+.micbtn{font-size:13px;padding:7px 10px;border-radius:8px;border:1px solid;cursor:pointer;line-height:1;transition:background .12s;}
+.micbtn:active{transform:scale(.97);}
+body.light .micbtn{background:#fff;color:#555;border-color:#ccc;}
+body.light .micbtn:hover{background:#f0f0ec;}
+body.light .micbtn.listening{background:#FCEBEB;color:#c0392b;border-color:#E24B4A;}
+body.dark .micbtn{background:#2a2a2a;color:#888;border-color:#3a3a3a;}
+body.dark .micbtn:hover{background:#333;}
+body.dark .micbtn.listening{background:#2d0b0b;color:#e88;border-color:#c0392b;}
 .vstatus{font-size:12px;padding:3px 8px;border-radius:20px;white-space:nowrap;font-weight:500;}
 .vstatus.ok{background:#E1F5EE;color:#085041;}
 .vstatus.ng{background:#FEF3E2;color:#9A4F00;}
@@ -220,6 +228,8 @@ const V=[
 ];
 
 const eyeOn='<svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
+const micSVG='<svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="11" rx="3"/><path d="M5 10a7 7 0 0 0 14 0"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/></svg>';
+const micOffSVG='<svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="1" y1="1" x2="23" y2="23"/><path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V4a3 3 0 0 0-5.94-.6"/><path d="M17 16.95A7 7 0 0 1 5 10v-2m14 0v2a7 7 0 0 1-.11 1.23"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/></svg>';
 const resetSVG='<svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>';
 const eyeOff='<svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>';
 
@@ -482,6 +492,66 @@ function resetInputs(){
   });
 }
 
+// 음성 인식 (Web Speech API - 한국어)
+let activeRecognition=null;
+let activeMicIdx=-1;
+
+function toggleMic(i){
+  // 이미 같은 버튼 누른 경우 → 중지
+  if(activeMicIdx===i && activeRecognition){
+    activeRecognition.stop();
+    return;
+  }
+  // 다른 mic 중지
+  if(activeRecognition){ activeRecognition.stop(); }
+
+  const SpeechRecognition=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SpeechRecognition){
+    alert('이 브라우저는 음성 입력을 지원하지 않습니다.\nChrome 브라우저를 사용해 주세요.');
+    return;
+  }
+
+  const inp=document.getElementById('inp'+i);
+  const btn=document.getElementById('mic'+i);
+  const rec=new SpeechRecognition();
+  rec.lang='ko-KR';
+  rec.continuous=false;
+  rec.interimResults=true;
+  rec.maxAlternatives=1;
+
+  activeRecognition=rec;
+  activeMicIdx=i;
+
+  rec.onstart=function(){
+    btn.classList.add('listening');
+    btn.innerHTML=micOffSVG;
+  };
+
+  rec.onresult=function(e){
+    let interim='', final='';
+    for(let k=0;k<e.results.length;k++){
+      if(e.results[k].isFinal) final+=e.results[k][0].transcript;
+      else interim+=e.results[k][0].transcript;
+    }
+    inp.value=(final||interim);
+  };
+
+  rec.onerror=function(e){
+    if(e.error!=='aborted') console.warn('음성인식 오류:',e.error);
+  };
+
+  rec.onend=function(){
+    btn.classList.remove('listening');
+    btn.innerHTML=micSVG;
+    activeRecognition=null;
+    activeMicIdx=-1;
+    // 입력값 있으면 자동 확인
+    if(inp.value.trim()) check(i);
+  };
+
+  rec.start();
+}
+
 function buildRangeBar(){
   const bar=document.getElementById('rangeBar');
   RANGES.forEach((rg,idx)=>{
@@ -513,6 +583,7 @@ function buildRows(){
         '<button class="vbtn" onclick="check('+i+')">확인</button>'+
         '<button class="eyebtn" id="eb'+i+'" onclick="toggleReveal('+i+')">'+eyeOn+'</button>'+
         '<button class="eyebtn" onclick="resetRow('+i+')" title="이 칸 초기화">'+resetSVG+'</button>'+
+        '<button class="micbtn" id="mic'+i+'" onclick="toggleMic('+i+')" title="음성 입력">'+micSVG+'</button>'+
         '<span class="vstatus" id="st'+i+'"></span>'+
       '</div>'+
       '<div class="vfeedback" id="fb'+i+'"></div>'+
