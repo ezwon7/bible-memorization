@@ -797,7 +797,7 @@ function toggleMic(i){
     if(silenceTimer) clearTimeout(silenceTimer);
     silenceTimer=setTimeout(()=>{
       if(activeRecognition) activeRecognition.stop();
-    }, 4000);
+    }, 5000);
   };
 
   rec.onend=function(){
