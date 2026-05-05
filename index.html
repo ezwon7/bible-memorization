@@ -944,9 +944,12 @@ function buildRows(){
     list.appendChild(row);
     document.getElementById('inp'+i).addEventListener('keydown',function(e){
       if(e.key==='Enter'){e.preventDefault();check(i);}
+      // Tab: preventDefault로 기본동작 막기만 (실제 이동은 keyup에서)
+      if(e.key==='Tab'){e.preventDefault();}
+    });
+    document.getElementById('inp'+i).addEventListener('keyup',function(e){
       if(e.key==='Tab'){
-        e.preventDefault();
-        // 현재 보이는 구절 중 다음 구절 입력칸으로 이동
+        // 한글 IME 조합 완료 후 이동 — 현재 보이는 구절 중 다음/이전 입력칸으로
         const visibleInputs=Array.from(document.querySelectorAll('.verse-row:not(.hidden) .vinput'));
         const idx=visibleInputs.indexOf(this);
         const next=e.shiftKey ? visibleInputs[idx-1] : visibleInputs[idx+1];
