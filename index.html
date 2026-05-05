@@ -14,7 +14,7 @@
 <title>포이맨 성경암송 60구절</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Malgun Gothic',sans-serif;padding:1.5rem;transition:background .2s,color .2s;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Malgun Gothic',sans-serif;padding:1.5rem;}
 
 body.light{background:#f5f5f0;color:#1a1a1a;}
 body.light .verse-row{background:#fff;border-color:#e0e0d8;}
@@ -102,11 +102,11 @@ body.dark .rbtn .rbot .try-num{color:rgba(255,255,255,.35);}
 .top{display:flex;align-items:center;gap:16px;margin-bottom:1rem;flex-wrap:wrap;}
 h1{font-size:20px;font-weight:600;flex:1;}
 .tip{font-size:12px;border-radius:8px;padding:6px 14px;margin-bottom:1.2rem;}
-.verse-row{border-radius:12px;border:1px solid;margin-bottom:10px;overflow:hidden;}
-.verse-row.hidden{display:none;}
+.verse-row{border-radius:12px;border:1px solid;margin-bottom:10px;overflow:hidden;contain:layout style;}
+.verse-row.hidden{display:none;content-visibility:auto;}
 .verse-header{display:flex;align-items:center;gap:8px;padding:10px 14px;}
 .vnum{font-size:13px;font-weight:600;min-width:26px;}
-.vinput{flex:1;font-size:14px;padding:7px 10px;border-radius:8px;border:1px solid;font-family:inherit;outline:none;transition:border-color .15s,background .15s;}
+.vinput{flex:1;font-size:14px;padding:7px 10px;border-radius:8px;border:1px solid;font-family:inherit;outline:none;transition:border-color .15s,background .15s;will-change:contents;}
 .vbtn{font-size:13px;padding:7px 14px;border-radius:8px;border:1px solid;cursor:pointer;white-space:nowrap;font-family:inherit;transition:background .12s;}
 .vbtn:active{transform:scale(.97);}
 .eyebtn{font-size:13px;padding:7px 10px;border-radius:8px;border:1px solid;cursor:pointer;line-height:1;transition:background .12s;}
@@ -116,15 +116,11 @@ h1{font-size:20px;font-weight:600;flex:1;}
 .micbtn.ready{animation:micpulse 0.6s ease-in-out infinite alternate;}
 .micbtn.listening{animation:micpulse 0.4s ease-in-out infinite alternate;}
 @keyframes micpulse{
-  from{box-shadow:0 0 0 0 rgba(192,57,43,0.4);}
-  to{box-shadow:0 0 0 6px rgba(192,57,43,0);}
+  from{opacity:1;}
+  to{opacity:0.5;}
 }
-body.dark .micbtn.ready{animation:micpulsedark 0.6s ease-in-out infinite alternate;}
-body.dark .micbtn.listening{animation:micpulsedark 0.4s ease-in-out infinite alternate;}
-@keyframes micpulsedark{
-  from{box-shadow:0 0 0 0 rgba(232,136,136,0.4);}
-  to{box-shadow:0 0 0 6px rgba(232,136,136,0);}
-}
+body.dark .micbtn.ready{animation:micpulse 0.6s ease-in-out infinite alternate;}
+body.dark .micbtn.listening{animation:micpulse 0.4s ease-in-out infinite alternate;}
 body.light .micbtn{background:#fff;color:#555;border-color:#ccc;}
 body.light .micbtn:hover{background:#f0f0ec;}
 body.light .micbtn.listening{background:#FCEBEB;color:#c0392b;border-color:#E24B4A;}
@@ -371,15 +367,24 @@ function buildDiff(inp, ans){
   return html;
 }
 
-// 정확도: 공백제거 후 글자 단위 LCS 매칭 수 / 정답 글자 수
+// 정확도: 공백제거 후 글자 단위 LCS 매칭 수 / 정답 글자 수 (캐시 적용)
+const _pctCache=new Map();
 function calcPct(inp, ans){
   const A=inp.replace(/\s/g,''), B=ans.replace(/\s/g,'');
+  const key=A+'|'+B;
+  if(_pctCache.has(key)) return _pctCache.get(key);
   const m=A.length, n=B.length;
+  if(n===0) return 0;
+  // 짧은 입력은 빠른 경로
+  if(A===B){ _pctCache.set(key,100); return 100; }
   const dp=Array.from({length:m+1},()=>new Uint16Array(n+1));
   for(let i=1;i<=m;i++)
     for(let j=1;j<=n;j++)
       dp[i][j]=A[i-1]===B[j-1]?dp[i-1][j-1]+1:Math.max(dp[i-1][j],dp[i][j-1]);
-  return Math.round(dp[m][n]/n*100);
+  const result=Math.round(dp[m][n]/n*100);
+  if(_pctCache.size>200) _pctCache.clear(); // 메모리 관리
+  _pctCache.set(key,result);
+  return result;
 }
 
 function updateBtn(idx){
@@ -952,16 +957,20 @@ function buildRows(){
     list.appendChild(row);
     document.getElementById('inp'+i).addEventListener('keydown',function(e){
       if(e.key==='Enter'){e.preventDefault();check(i);}
-      // Tab: preventDefault로 기본동작 막기만 (실제 이동은 keyup에서)
       if(e.key==='Tab'){e.preventDefault();}
     });
     document.getElementById('inp'+i).addEventListener('keyup',function(e){
       if(e.key==='Tab'){
-        // 한글 IME 조합 완료 후 이동 — 현재 보이는 구절 중 다음/이전 입력칸으로
+        e.preventDefault();
         const visibleInputs=Array.from(document.querySelectorAll('.verse-row:not(.hidden) .vinput'));
         const idx=visibleInputs.indexOf(this);
         const next=e.shiftKey ? visibleInputs[idx-1] : visibleInputs[idx+1];
-        if(next){ next.focus(); next.setSelectionRange(next.value.length,next.value.length); }
+        if(next){
+          next.focus();
+          next.setSelectionRange(next.value.length,next.value.length);
+          // 다음 칸이 화면 안에 보이도록 부드럽게 스크롤
+          next.closest('.verse-row').scrollIntoView({behavior:'smooth',block:'nearest'});
+        }
       }
     });
   });
