@@ -880,9 +880,11 @@ function convertSpeechToText(text){
   const korPattern=Object.keys(korNum).join('|');
   t=t.replace(new RegExp('('+korPattern+')(?=\s*[장절])', 'g'), m=>korNum[m]||m);
 
-  // 3단계: "X장 Y절" → "X:Y"
+  // 3단계: "X장 Y절에서 Z절" → "X:Y-Z" (범위 먼저 처리)
+  t=t.replace(/(\d+)\s*장\s*(\d+)\s*절\s*[에서부터~]\s*(\d+)\s*절/g,'$1:$2-$3');
+  // "X장 Y절" → "X:Y"
   t=t.replace(/(\d+)\s*장\s*(\d+)\s*절/g,'$1:$2');
-  // 범위: "4장 19절에서 20절" → "4:19-20"
+  // "X:Y에서 Z절" → "X:Y-Z" (이미 변환된 경우)
   t=t.replace(/(\d+:\d+)\s*[에서부터~]\s*(\d+)\s*절/g,'$1-$2');
 
   // 4단계: "콜론" → ":", 공백 정리
