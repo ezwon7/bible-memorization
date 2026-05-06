@@ -10,6 +10,79 @@
   gtag('js', new Date());
   gtag('config', 'G-P625JKM277');
 </script>
+<!-- Firebase SDK -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCTRRORSH5B0jnrJ9F3D_vvoTl9lvgSHv4",
+  authDomain: "poimen-bible.firebaseapp.com",
+  projectId: "poimen-bible",
+  storageBucket: "poimen-bible.firebasestorage.app",
+  messagingSenderId: "585838718857",
+  appId: "1:585838718857:web:20fae6aea43ec047447b58"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const provider = new GoogleAuthProvider();
+
+let currentUser = null;
+
+// 전역 함수로 노출
+window._fbSignIn = async function(){
+  try{ await signInWithPopup(auth, provider); }
+  catch(e){ console.error(e); }
+};
+window._fbSignOut = async function(){
+  await signOut(auth);
+};
+
+// 데이터 저장 (채점할 때마다 호출)
+window._fbSaveStats = async function(verseIdx, isCorrect){
+  if(!currentUser) return;
+  const ref = doc(db, 'users', currentUser.uid, 'stats', String(verseIdx));
+  const snap = await getDoc(ref);
+  const data = snap.exists() ? snap.data() : {tries:0, correct:0};
+  data.tries += 1;
+  if(isCorrect) data.correct += 1;
+  await setDoc(ref, data);
+};
+
+// 데이터 불러오기
+window._fbLoadStats = async function(){
+  if(!currentUser) return null;
+  const results = {};
+  for(let i=0;i<60;i++){
+    const ref = doc(db, 'users', currentUser.uid, 'stats', String(i));
+    const snap = await getDoc(ref);
+    if(snap.exists()) results[i] = snap.data();
+  }
+  return results;
+};
+
+// 로그인 상태 감지
+onAuthStateChanged(auth, async (user) => {
+  currentUser = user;
+  const btn = document.getElementById('fbAuthBtn');
+  const userInfo = document.getElementById('fbUserInfo');
+  if(user){
+    if(btn){ btn.textContent='로그아웃'; btn.onclick=window._fbSignOut; }
+    if(userInfo){ userInfo.textContent=user.displayName||user.email; userInfo.style.display='inline'; }
+    // 저장된 통계 불러오기
+    const stats = await window._fbLoadStats();
+    if(stats) window._fbApplyStats(stats);
+  } else {
+    if(btn){ btn.textContent='구글 로그인'; btn.onclick=window._fbSignIn; }
+    if(userInfo){ userInfo.textContent=''; userInfo.style.display='none'; }
+  }
+});
+</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>포이맨 성경암송 60구절</title>
 <style>
@@ -175,6 +248,13 @@ body.dark .book-header{color:#e0e0da;}
       <svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
       다시 쓰기
     </button>
+    <div style="display:flex;align-items:center;gap:6px;margin-left:8px;">
+      <span id="fbUserInfo" style="font-size:12px;opacity:.6;display:none;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>
+      <button id="fbAuthBtn" class="global-eye" onclick="window._fbSignIn()" title="구글 계정으로 로그인하면 학습 기록이 저장됩니다">
+        <svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        구글 로그인
+      </button>
+    </div>
   </div>
 
   <div class="range-bar" style="margin-bottom:1.2rem;display:flex;align-items:center;gap:4px;flex-wrap:wrap;">
@@ -714,8 +794,15 @@ function check(i){
   if(calcPct(val,ans)===100){
     inp.classList.remove('wrong'); inp.classList.add('correct');
     st.className='vstatus ok'; st.textContent='정답';
-    fb.className='vfeedback'; fb.innerHTML='';
+    // 정답일 때도 전체 구절 보여주기
+    fb.className='vfeedback show';
+    fb.style.color='';
+    const v=V[i];
+    const ansWords=ans.trim().split(/\s+/).filter(Boolean);
+    fb.innerHTML=ansWords.map(w=>'<span class="ok-ch">'+w.replace(/\s/g,'')+'</span>').join(' ');
     done.add(i); updateAllBtns();
+    // Firebase에 정답 저장
+    if(window._fbSaveStats) window._fbSaveStats(i, true);
   } else {
     inp.classList.remove('correct'); inp.classList.add('wrong');
     st.className='vstatus ng';
@@ -724,8 +811,28 @@ function check(i){
     st.textContent='정확도 '+pct+'%';
     fb.className='vfeedback show';
     fb.innerHTML=buildDiff(val,ans);
+    // Firebase에 오답 저장
+    if(window._fbSaveStats) window._fbSaveStats(i, false);
   }
 }
+
+// Firebase에서 불러온 통계 적용 (약점 구절 표시)
+window._fbApplyStats = function(stats){
+  V.forEach((_,v)=>{
+    const s=stats[v];
+    if(!s||s.tries<2) return;
+    const pct=Math.round((s.tries-s.correct)/s.tries*100);
+    const vnum=document.getElementById('vnum'+v);
+    if(!vnum) return;
+    if(pct>=60){
+      // 오답률 60% 이상 → 약점 표시
+      vnum.innerHTML=(v+1)+'<span style="font-size:9px;color:#E24B4A;margin-left:2px;">⚠'+pct+'%</span>';
+    } else if(s.correct>0 && s.correct===s.tries){
+      // 100% 정답 → 완료 표시
+      vnum.innerHTML=(v+1)+'<span style="font-size:9px;color:#1D9E75;margin-left:2px;">✓</span>';
+    }
+  });
+};
 
 function resetRow(i){
   const inp=document.getElementById('inp'+i);
