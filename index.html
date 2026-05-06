@@ -214,6 +214,12 @@ body.dark .micbtn.listening{background:#2d0b0b;color:#e88;border-color:#c0392b;}
 .vrevealed.show{display:block;}
 .vrevealed strong{font-weight:600;display:block;margin-bottom:2px;}
 .eye-icon{width:16px;height:16px;display:inline-block;vertical-align:middle;}
+body.light #bookSortBarInner{background:#e8e8e2;border-color:#d0d0c8;}
+body.light #bsCount,body.light #bsBible{color:#666;}
+body.light #bsCount.sel,body.light #bsBible.sel{background:#fff;color:#1a1a1a;box-shadow:0 1px 3px rgba(0,0,0,.1);}
+body.dark #bookSortBarInner{background:#222;border-color:#333;}
+body.dark #bsCount,body.dark #bsBible{color:#666;}
+body.dark #bsCount.sel,body.dark #bsBible.sel{background:#333;color:#e0e0da;}
 body.light #searchInp{background:#fff;color:#1a1a1a;border-color:#ddd;}
 body.light #searchInp:focus{border-color:#1D9E75;box-shadow:0 0 0 2px rgba(29,158,117,.12);}
 body.dark #searchInp{background:#2a2a2a;color:#e0e0da;border-color:#3a3a3a;}
@@ -276,6 +282,12 @@ body.dark .book-header{color:#e0e0da;}
       <svg style="position:absolute;left:12px;top:50%;transform:translateY(-50%);opacity:.4;pointer-events:none;" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
     </div>
     <div id="searchCount" style="font-size:12px;opacity:.5;margin-top:6px;padding-left:2px;"></div>
+  </div>
+  <div id="bookSortBar" style="display:none;margin-bottom:0.8rem;">
+    <div style="display:inline-flex;gap:4px;padding:3px;border-radius:8px;border:1px solid;" id="bookSortBarInner">
+      <span id="bsCount" onclick="setBookSort('count')" style="font-size:12px;cursor:pointer;padding:4px 12px;border-radius:6px;font-weight:500;background:var(--bs-sel,transparent);">많은 순</span>
+      <span id="bsBible" onclick="setBookSort('bible')" style="font-size:12px;cursor:pointer;padding:4px 12px;border-radius:6px;font-weight:500;">성경 순서</span>
+    </div>
   </div>
   <div class="top"><h1>포이맨 성경암송 60구절</h1></div>
   <div class="tip">구절+본문 입력 예) <b>에베소서 4:13 우리가 다 하나님의...</b> &nbsp;|&nbsp; 엔터 또는 확인으로 채점 &nbsp;|&nbsp; 띄어쓰기 무시</div>
@@ -493,6 +505,38 @@ function shuffle(arr){ for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.r
 // 성경 권별 순서 (많은 구절 순)
 function bookOf(ref){ return ref.split(' ')[0]; }
 
+// 성경 정경 순서
+const BIBLE_ORDER=[
+  '창세기','출애굽기','레위기','민수기','신명기','여호수아','사사기','룻기',
+  '사무엘상','사무엘하','열왕기상','열왕기하','역대상','역대하','에스라','느헤미야','에스더',
+  '욥기','시편','잠언','전도서','아가','이사야','예레미야','예레미야애가',
+  '에스겔','다니엘','호세아','요엘','아모스','오바댜','요나','미가','나훔','하박국',
+  '스바냐','학개','스가랴','말라기',
+  '마태복음','마가복음','누가복음','요한복음','사도행전',
+  '로마서','고린도전서','고린도후서','갈라디아서','에베소서','빌립보서','골로새서',
+  '데살로니가전서','데살로니가후서','디모데전서','디모데후서','디도서','빌레몬서',
+  '히브리서','야고보서','베드로전서','베드로후서','요한일서','요한이서','요한삼서',
+  '유다서','요한계시록'
+];
+
+// 장절 파싱 (예: "4:19" → {ch:4, vs:19})
+function parseRef(ref){
+  const parts=ref.split(' ');
+  const cv=(parts[1]||'').replace('편','').split(':');
+  const ch=parseInt(cv[0])||0;
+  const vs=parseInt((cv[1]||'').split('-')[0])||0;
+  return {ch,vs};
+}
+
+let bookSortMode='count'; // 'count' or 'bible'
+
+function setBookSort(mode){
+  bookSortMode=mode;
+  document.getElementById('bsCount').className=mode==='count'?'sel':'';
+  document.getElementById('bsBible').className=mode==='bible'?'sel':'';
+  setRange(curRange);
+}
+
 function setSortMode(mode){
   sortMode=mode;
   document.getElementById('lSeq').className='ctrl-label'+(mode==='seq'?' sel':'');
@@ -502,6 +546,14 @@ function setSortMode(mode){
 
   const searchBar=document.getElementById('searchBar');
   const rangeBar=document.getElementById('rangeBar').parentElement;
+
+  // 권별 정렬 옵션 바 표시/숨김
+  const bookSortBar=document.getElementById('bookSortBar');
+  if(bookSortBar) bookSortBar.style.display=(mode==='book')?'block':'none';
+  if(mode==='book'){
+    document.getElementById('bsCount').className=bookSortMode==='count'?'sel':'';
+    document.getElementById('bsBible').className=bookSortMode==='bible'?'sel':'';
+  }
 
   if(mode==='search'){
     searchBar.style.display='block';
@@ -700,27 +752,39 @@ function setRange(idx){
     indices.forEach(i=>list.appendChild(document.getElementById('row'+i)));
 
   } else if(sortMode==='book'){
-    // group by book, sort groups by count desc, within group keep original order
+    // group by book
     const bookMap={};
     indices.forEach(i=>{
       const b=bookOf(V[i].r);
       if(!bookMap[b]) bookMap[b]=[];
       bookMap[b].push(i);
     });
-    // sort books by count desc, ties by first appearance
-    const books=Object.keys(bookMap).sort((a,b)=>{
-      const diff=bookMap[b].length-bookMap[a].length;
-      if(diff!==0) return diff;
-      return bookMap[a][0]-bookMap[b][0];
-    });
+    // sort books
+    let books=Object.keys(bookMap);
+    if(bookSortMode==='bible'){
+      // 정경 순서로 정렬
+      books.sort((a,b)=>{
+        const ai=BIBLE_ORDER.indexOf(a), bi=BIBLE_ORDER.indexOf(b);
+        return (ai===-1?999:ai)-(bi===-1?999:bi);
+      });
+    } else {
+      // 개수 많은 순
+      books.sort((a,b)=>{
+        const diff=bookMap[b].length-bookMap[a].length;
+        return diff!==0?diff:bookMap[a][0]-bookMap[b][0];
+      });
+    }
     books.forEach(book=>{
-      // insert book header
       const hdr=document.createElement('div');
       hdr.className='book-header show';
       hdr.textContent=book+' ('+bookMap[book].length+'개)';
       list.appendChild(hdr);
-      // append rows in original order
-      bookMap[book].sort((a,b)=>a-b).forEach(i=>list.appendChild(document.getElementById('row'+i)));
+      // 권 안에서 장절 순으로 정렬
+      const sorted=[...bookMap[book]].sort((a,b)=>{
+        const pa=parseRef(V[a].r), pb=parseRef(V[b].r);
+        return pa.ch!==pb.ch?pa.ch-pb.ch:pa.vs-pb.vs;
+      });
+      sorted.forEach(i=>list.appendChild(document.getElementById('row'+i)));
     });
 
   } else {
@@ -823,24 +887,28 @@ function check(i){
 
 // Firebase에서 불러온 통계 적용 (약점 구절 표시)
 window._fbApplyStats = function(stats){
-  window.fbStats = stats; // 전역 저장
-  let hasWeak = false;
+  window.fbStats = stats;
+  // 번호 옆 표시 없이 약점 개수만 계산
+  let weakCount = 0;
   V.forEach((_,v)=>{
     const s=stats[v];
     if(!s||s.tries<2) return;
     const pct=Math.round((s.tries-s.correct)/s.tries*100);
+    // 번호 원래대로 복원
     const vnum=document.getElementById('vnum'+v);
-    if(!vnum) return;
-    if(pct>=60){
-      vnum.innerHTML=(v+1)+'<span style="font-size:9px;color:#E24B4A;margin-left:2px;">⚠'+pct+'%</span>';
-      hasWeak = true;
-    } else if(s.correct>0 && s.correct===s.tries){
-      vnum.innerHTML=(v+1)+'<span style="font-size:9px;color:#1D9E75;margin-left:2px;">✓</span>';
-    }
+    if(vnum) vnum.textContent=(v+1);
+    if(pct>=60) weakCount++;
   });
-  // 약점 구절이 있으면 약점 버튼 표시
+  // 약점 버튼 업데이트
   const btn = document.getElementById('weakBtn');
-  if(btn) btn.style.display = hasWeak ? 'inline-block' : 'none';
+  if(btn){
+    if(weakCount>0){
+      btn.style.display='inline-block';
+      btn.textContent='⚠️ 약점 '+weakCount+'개';
+    } else {
+      btn.style.display='none';
+    }
+  }
 };
 
 
@@ -1083,12 +1151,15 @@ function toggleWeak(){
   if(weakMode){
     btn.style.background = '#E24B4A';
     btn.style.color = '#fff';
+    btn.style.borderColor = '#E24B4A';
     applyWeakFilter();
   } else {
     btn.style.background = 'transparent';
     btn.style.color = '#E24B4A';
-    // 기존 구간 필터로 복귀
+    btn.style.borderColor = '#E24B4A';
     setRange(curRange);
+    // 버튼 텍스트 원래대로
+    if(window._fbApplyStats) window._fbApplyStats(window.fbStats);
   }
 }
 
@@ -1109,8 +1180,6 @@ function applyWeakFilter(){
     }
     row.classList.add('hidden');
   });
-  const countEl = document.getElementById('weakCount');
-  if(countEl) countEl.textContent = count > 0 ? '약점 '+count+'개 구절' : '약점 구절 없음 (데이터 부족)';
 }
 
 function buildRangeBar(){
