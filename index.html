@@ -268,9 +268,12 @@ body.dark .book-header{color:#e0e0da;}
     </div>
   </div>
 
-  <div class="range-bar" style="margin-bottom:1.2rem;display:flex;align-items:center;gap:4px;flex-wrap:wrap;">
-    <span style="font-size:11px;white-space:nowrap;opacity:.5;padding:4px 8px 4px 4px;flex-shrink:0;border-right:1px solid rgba(128,128,128,.2);margin-right:2px;">&#x2713;&nbsp;완료&nbsp;&#x21BA;&nbsp;시도</span>
-    <div id="rangeBar" style="display:contents;"></div>
+  <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:1.2rem;">
+    <div class="range-bar" style="margin-bottom:0;display:flex;align-items:center;gap:4px;flex-wrap:wrap;flex:1;">
+      <span style="font-size:11px;white-space:nowrap;opacity:.5;padding:4px 8px 4px 4px;flex-shrink:0;border-right:1px solid rgba(128,128,128,.2);margin-right:2px;">&#x2713;&nbsp;완료&nbsp;&#x21BA;&nbsp;시도</span>
+      <div id="rangeBar" style="display:contents;"></div>
+    </div>
+    <button id="weakBtn" onclick="toggleWeak()" style="display:none;font-size:12px;font-weight:500;padding:5px 14px;border-radius:20px;border:1.5px solid #E24B4A;color:#E24B4A;background:transparent;cursor:pointer;white-space:nowrap;font-family:inherit;flex-shrink:0;">⚠️ 약점 0개</button>
   </div>
 
   <div id="searchBar" style="display:none;margin-bottom:1.2rem;">
@@ -892,7 +895,7 @@ window._fbApplyStats = function(stats){
   let weakCount = 0;
   V.forEach((_,v)=>{
     const s=stats[v];
-    if(!s||s.tries<2) return;
+    if(!s||s.tries<1) return;
     const pct=Math.round((s.tries-s.correct)/s.tries*100);
     // 번호 원래대로 복원
     const vnum=document.getElementById('vnum'+v);
