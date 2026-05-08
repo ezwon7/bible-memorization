@@ -89,7 +89,7 @@ onAuthStateChanged(auth, async (user) => {
 });
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>포이맨 성경암송 60구절</title>
+<title>NCBC 제자반 성경암송 구절</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Malgun Gothic',sans-serif;padding:1.5rem;}
@@ -236,10 +236,10 @@ body.dark .book-header{color:#e0e0da;}
 <div id="wrap">
   <div class="topbar">
     <div class="ctrl-bar">
-      <input type="radio" name="mode" id="mLight" class="ctrl-radio" checked>
-      <label for="mLight" class="ctrl-label sel" id="lLight" onclick="setMode('light')">라이트</label>
-      <input type="radio" name="mode" id="mDark" class="ctrl-radio">
-      <label for="mDark" class="ctrl-label" id="lDark" onclick="setMode('dark')">다크</label>
+      <input type="radio" name="lang" id="lKo" class="ctrl-radio" checked>
+      <label for="lKo" class="ctrl-label sel" id="lblKo" onclick="setLang('ko')">한국어</label>
+      <input type="radio" name="lang" id="lEn" class="ctrl-radio">
+      <label for="lEn" class="ctrl-label" id="lblEn" onclick="setLang('en')">English</label>
     </div>
     <div class="ctrl-bar">
       <input type="radio" name="rmode" id="rmSeq" class="ctrl-radio" checked>
@@ -269,11 +269,11 @@ body.dark .book-header{color:#e0e0da;}
   </div>
 
   <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:1.2rem;">
-    <div class="range-bar" style="margin-bottom:0;display:flex;align-items:center;gap:4px;flex-wrap:wrap;flex:1;">
-      <span style="font-size:11px;white-space:nowrap;opacity:.5;padding:4px 8px 4px 4px;flex-shrink:0;border-right:1px solid rgba(128,128,128,.2);margin-right:2px;">&#x2713;&nbsp;완료&nbsp;&#x21BA;&nbsp;시도</span>
-      <div id="rangeBar" style="display:contents;"></div>
+    <div id="rangeBar" style="display:flex;align-items:flex-start;gap:6px;flex-wrap:wrap;flex:1;"></div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0;">
+      <span style="font-size:11px;white-space:nowrap;opacity:.5;">&#x2713;&nbsp;완료&nbsp;&#x21BA;&nbsp;시도</span>
+      <button id="weakBtn" onclick="toggleWeak()" style="display:none;font-size:12px;font-weight:500;padding:5px 14px;border-radius:20px;border:1.5px solid #E24B4A;color:#E24B4A;background:transparent;cursor:pointer;white-space:nowrap;font-family:inherit;">⚠️ 약점 0개</button>
     </div>
-    <button id="weakBtn" onclick="toggleWeak()" style="display:none;font-size:12px;font-weight:500;padding:5px 14px;border-radius:20px;border:1.5px solid #E24B4A;color:#E24B4A;background:transparent;cursor:pointer;white-space:nowrap;font-family:inherit;flex-shrink:0;">⚠️ 약점 0개</button>
   </div>
 
   <div id="searchBar" style="display:none;margin-bottom:1.2rem;">
@@ -292,7 +292,15 @@ body.dark .book-header{color:#e0e0da;}
       <span id="bsBible" onclick="setBookSort('bible')" style="font-size:12px;cursor:pointer;padding:4px 12px;border-radius:6px;font-weight:500;">성경 순서</span>
     </div>
   </div>
-  <div class="top"><h1>포이맨 성경암송 60구절</h1></div>
+  <div class="top">
+    <h1>NCBC 제자반 성경암송 구절</h1>
+    <div class="ctrl-bar" style="padding:2px;gap:2px;">
+      <input type="radio" name="mode" id="mLight" class="ctrl-radio" checked>
+      <label for="mLight" class="ctrl-label sel" id="lLight" onclick="setMode('light')" style="font-size:11px;padding:3px 10px;">라이트</label>
+      <input type="radio" name="mode" id="mDark" class="ctrl-radio">
+      <label for="mDark" class="ctrl-label" id="lDark" onclick="setMode('dark')" style="font-size:11px;padding:3px 10px;">다크</label>
+    </div>
+  </div>
   <div class="tip">구절+본문 입력 예) <b>에베소서 4:13 우리가 다 하나님의...</b> &nbsp;|&nbsp; 엔터 또는 확인으로 채점 &nbsp;|&nbsp; 띄어쓰기 무시</div>
   <div id="list"></div>
 </div>
@@ -361,6 +369,74 @@ const V=[
 {r:"시편 23편",t:"여호와는 나의 목자시니 내게 부족함이 없으리로다 그가 나를 푸른 풀밭에 누이시며 쉴 만한 물가로 인도하시는도다 내 영혼을 소생시키시고 자기 이름을 위하여 의의 길로 인도하시는도다 내가 사망의 음침한 골짜기로 다닐지라도 해를 두려워하지 않을 것은 주께서 나와 함께 하심이라 주의 지팡이와 막대기가 나를 안위하시나이다 주께서 내 원수의 목전에서 내게 상을 차려 주시고 기름을 내 머리에 부으셨으니 내 잔이 넘치나이다 내 평생에 선하심과 인자하심이 반드시 나를 따르리니 내가 여호와의 집에 영원히 살리로다"}
 ];
 
+// ESV English verses
+const VE=[
+{r:"Ephesians 4:13",t:"until we all attain to the unity of the faith and of the knowledge of the Son of God, to mature manhood, to the measure of the stature of the fullness of Christ"},
+{r:"Matthew 4:19",t:"And he said to them, Follow me, and I will make you fishers of men"},
+{r:"Matthew 5:16",t:"In the same way, let your light shine before others, so that they may see your good works and give glory to your Father who is in heaven"},
+{r:"Matthew 6:33",t:"But seek first the kingdom of God and his righteousness, and all these things will be added to you"},
+{r:"Matthew 9:35",t:"And Jesus went throughout all the cities and villages, teaching in their synagogues and proclaiming the gospel of the kingdom and healing every disease and every affliction"},
+{r:"Matthew 10:16",t:"Behold, I am sending you out as sheep in the midst of wolves, so be wise as serpents and innocent as doves"},
+{r:"Matthew 10:32-33",t:"So everyone who acknowledges me before men, I also will acknowledge before my Father who is in heaven, but whoever denies me before men, I also will deny before my Father who is in heaven"},
+{r:"Matthew 11:29-30",t:"Take my yoke upon you, and learn from me, for I am gentle and lowly in heart, and you will find rest for your souls. For my yoke is easy, and my burden is light"},
+{r:"Matthew 14:23",t:"And after he had dismissed the crowds, he went up on the mountain by himself to pray. When evening came, he was there alone"},
+{r:"Matthew 16:19",t:"I will give you the keys of the kingdom of heaven, and whatever you bind on earth shall be bound in heaven, and whatever you loose on earth shall be loosed in heaven"},
+{r:"Matthew 16:24-25",t:"Then Jesus told his disciples, If anyone would come after me, let him deny himself and take up his cross and follow me. For whoever would save his life will lose it, but whoever loses his life for my sake will find it"},
+{r:"Matthew 18:19",t:"Again I say to you, if two of you agree on earth about anything they ask, it will be done for them by my Father in heaven"},
+{r:"Matthew 19:26",t:"But Jesus looked at them and said, With man this is impossible, but with God all things are possible"},
+{r:"Matthew 20:28",t:"even as the Son of Man came not to be served but to serve, and to give his life as a ransom for many"},
+{r:"Matthew 21:22",t:"And whatever you ask in prayer, you will receive, if you have faith"},
+{r:"Matthew 24:45",t:"Who then is the faithful and wise servant, whom his master has set over his household, to give them their food at the proper time"},
+{r:"Matthew 25:40",t:"And the King will answer them, Truly, I say to you, as you did it to one of the least of these my brothers, you did it to me"},
+{r:"Matthew 28:18-20",t:"And Jesus came and said to them, All authority in heaven and on earth has been given to me. Go therefore and make disciples of all nations, baptizing them in the name of the Father and of the Son and of the Holy Spirit, teaching them to observe all that I have commanded you. And behold, I am with you always, to the end of the age"},
+{r:"Isaiah 52:7",t:"How beautiful upon the mountains are the feet of him who brings good news, who publishes peace, who brings good news of happiness, who publishes salvation, who says to Zion, Your God reigns"},
+{r:"Jeremiah 29:11",t:"For I know the plans I have for you, declares the LORD, plans for welfare and not for evil, to give you a future and a hope"},
+{r:"Hosea 6:6",t:"For I desire steadfast love and not sacrifice, the knowledge of God rather than burnt offerings"},
+{r:"Ephesians 5:8",t:"for at one time you were darkness, but now you are light in the Lord. Walk as children of light"},
+{r:"Isaiah 61:1",t:"The Spirit of the Lord GOD is upon me, because the LORD has anointed me to bring good news to the poor; he has sent me to bind up the brokenhearted, to proclaim liberty to the captives, and the opening of the prison to those who are bound"},
+{r:"Ephesians 6:12",t:"For we do not wrestle against flesh and blood, but against the rulers, against the authorities, against the cosmic powers over this present darkness, against the spiritual forces of evil in the heavenly places"},
+{r:"Isaiah 26:3",t:"You keep him in perfect peace whose mind is stayed on you, because he trusts in you"},
+{r:"Ephesians 4:29",t:"Let no corrupting talk come out of your mouths, but only such as is good for building up, as fits the occasion, that it may give grace to those who hear"},
+{r:"1 Corinthians 10:31",t:"So, whether you eat or drink, or whatever you do, do all to the glory of God"},
+{r:"Psalm 46:10",t:"Be still, and know that I am God. I will be exalted among the nations, I will be exalted in the earth"},
+{r:"Psalm 27:1",t:"The LORD is my light and my salvation; whom shall I fear? The LORD is the stronghold of my life; of whom shall I be afraid"},
+{r:"1 Corinthians 4:20",t:"For the kingdom of God does not consist in talk but in power"},
+{r:"Isaiah 40:31",t:"but they who wait for the LORD shall renew their strength; they shall mount up with wings like eagles; they shall run and not be weary; they shall walk and not faint"},
+{r:"James 4:7",t:"Submit yourselves therefore to God. Resist the devil, and he will flee from you"},
+{r:"Proverbs 13:20",t:"Whoever walks with the wise becomes wise, but the companion of fools will suffer harm"},
+{r:"1 Corinthians 1:18",t:"For the word of the cross is folly to those who are perishing, but to us who are being saved it is the power of God"},
+{r:"John 16:33",t:"I have said these things to you, that in me you may have peace. In the world you will have tribulation. But take heart; I have overcome the world"},
+{r:"2 Corinthians 5:7",t:"for we walk by faith, not by sight"},
+{r:"Isaiah 60:1",t:"Arise, shine, for your light has come, and the glory of the LORD has risen upon you"},
+{r:"Hebrews 4:12",t:"For the word of God is living and active, sharper than any two-edged sword, piercing to the division of soul and of spirit, of joints and of marrow, and discerning the thoughts and intentions of the heart"},
+{r:"Philippians 2:3-4",t:"Do nothing from selfish ambition or conceit, but in humility count others more significant than yourselves. Let each of you look not only to his own interests, but also to the interests of others"},
+{r:"1 John 5:18",t:"We know that everyone who has been born of God does not keep on sinning, but he who was born of God protects him, and the evil one does not touch him"},
+{r:"John 13:34-35",t:"A new commandment I give to you, that you love one another: just as I have loved you, you also are to love one another. By this all people will know that you are my disciples, if you have love for one another"},
+{r:"1 Peter 4:11",t:"whoever speaks, as one who speaks oracles of God; whoever serves, as one who serves by the strength that God supplies"},
+{r:"Galatians 5:22-23",t:"But the fruit of the Spirit is love, joy, peace, patience, kindness, goodness, faithfulness, gentleness, self-control; against such things there is no law"},
+{r:"1 Thessalonians 4:16-17",t:"For the Lord himself will descend from heaven with a cry of command, with the voice of an archangel, and with the sound of the trumpet of God. And the dead in Christ will rise first. Then we who are alive, who are left, will be caught up together with them in the clouds to meet the Lord in the air, and so we will always be with the Lord"},
+{r:"2 Timothy 2:2",t:"and what you have heard from me in the presence of many witnesses entrust to faithful men, who will be able to teach others also"},
+{r:"Romans 14:7-8",t:"For none of us lives to himself, and none of us dies to himself. For if we live, we live to the Lord, and if we die, we die to the Lord. So then, whether we live or whether we die, we are the Lord's"},
+{r:"Ephesians 6:10-11",t:"Finally, be strong in the Lord and in the strength of his might. Put on the whole armor of God, that you may be able to stand against the schemes of the devil"},
+{r:"Ephesians 5:15-16",t:"Look carefully then how you walk, not as unwise but as wise, making the best use of the time, because the days are evil"},
+{r:"Romans 8:28",t:"And we know that for those who love God all things work together for good, for those who are called according to his purpose"},
+{r:"1 Timothy 6:17",t:"As for the rich in this present age, charge them not to be haughty, nor to set their hopes on the uncertainty of riches, but on God, who richly provides us with everything to enjoy"},
+{r:"Proverbs 15:23",t:"To make an apt answer is a joy to a man, and a word in season, how good it is"},
+{r:"1 Corinthians 6:19-20",t:"Or do you not know that your body is a temple of the Holy Spirit within you, whom you have from God? You are not your own, for you were bought with a price. So glorify God in your body"},
+{r:"Luke 6:45",t:"The good person out of the good treasure of his heart produces good, and the evil person out of his evil treasure produces evil, for out of the abundance of the heart his mouth speaks"},
+{r:"John 14:21",t:"Whoever has my commandments and keeps them, he it is who loves me. And he who loves me will be loved by my Father, and I will love him and manifest myself to him"},
+{r:"Ephesians 2:8-9",t:"For by grace you have been saved through faith. And this is not your own doing; it is the gift of God, not a result of works, so that no one may boast"},
+{r:"Galatians 2:20",t:"I have been crucified with Christ. It is no longer I who live, but Christ who lives in me. And the life I now live in the flesh I live by faith in the Son of God, who loved me and gave himself for me"},
+{r:"John 1:1",t:"In the beginning was the Word, and the Word was with God, and the Word was God"},
+{r:"Joshua 1:8",t:"This Book of the Law shall not depart from your mouth, but you shall meditate on it day and night, so that you may be careful to do according to all that is written in it. For then you will make your way prosperous, and then you will have good success"},
+{r:"Psalm 1",t:"Blessed is the man who walks not in the counsel of the wicked, nor stands in the way of sinners, nor sits in the seat of scoffers; but his delight is in the law of the LORD, and on his law he meditates day and night. He is like a tree planted by streams of water that yields its fruit in its season, and its leaf does not wither. In all that he does, he prospers. The wicked are not so, but are like chaff that the wind drives away. Therefore the wicked will not stand in the judgment, nor sinners in the congregation of the righteous; for the LORD knows the way of the righteous, but the way of the wicked will perish"},
+{r:"Psalm 23",t:"The LORD is my shepherd; I shall not want. He makes me lie down in green pastures. He leads me beside still waters. He restores my soul. He leads me in paths of righteousness for his name's sake. Even though I walk through the valley of the shadow of death, I will fear no evil, for you are with me; your staff and your rod, they comfort me. You prepare a table before me in the presence of my enemies; you anoint my head with oil; my cup overflows. Surely goodness and mercy shall follow me all the days of my life, and I shall dwell in the house of the LORD forever"}
+];
+
+let lang='ko'; // 'ko' or 'en'
+function currentV(){ return lang==='en'?VE:V; }
+function currentFull(i){ const v=currentV()[i]; return v.r+' '+v.t; }
+
 const eyeOn='<svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
 const micReadySVG='<svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="11" rx="3" stroke-dasharray="2 1.5" opacity="0.5"/><path d="M5 10a7 7 0 0 0 14 0"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/></svg>';
 const micSVG='<svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="11" rx="3"/><path d="M5 10a7 7 0 0 0 14 0"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/></svg>';
@@ -368,15 +444,25 @@ const micOffSVG='<svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="c
 const resetSVG='<svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>';
 const eyeOff='<svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>';
 
-const RANGES=[
-  {label:'전체', s:0,  e:59},
-  {label:'1-10', s:0,  e:9},
-  {label:'11-20',s:10, e:19},
-  {label:'21-30',s:20, e:29},
-  {label:'31-40',s:30, e:39},
-  {label:'41-50',s:40, e:49},
-  {label:'51-60',s:50, e:59},
+// 그룹 정의: 반 이름 + 세부 구간
+const GROUPS=[
+  {name:'전체',    s:0,  e:59, subs:[]},
+  {name:'디사이플', s:0,  e:19, subs:[{label:'1-10',s:0,e:9},{label:'11-20',s:10,e:19}]},
+  {name:'둘로스',  s:20, e:39, subs:[{label:'21-30',s:20,e:29},{label:'31-40',s:30,e:39}]},
+  {name:'포이맨',  s:40, e:59, subs:[{label:'41-50',s:40,e:49},{label:'51-60',s:50,e:59}]},
 ];
+// RANGES 호환용 (통계 카운터용)
+const RANGES=[
+  {label:'전체',   s:0,  e:59},
+  {label:'1-10',  s:0,  e:9},
+  {label:'11-20', s:10, e:19},
+  {label:'21-30', s:20, e:29},
+  {label:'31-40', s:30, e:39},
+  {label:'41-50', s:40, e:49},
+  {label:'51-60', s:50, e:59},
+];
+// 현재 선택된 구간
+let curS=0, curE=59;
 
 const done=new Set();
 const tries=new Array(RANGES.length).fill(0);
@@ -467,9 +553,46 @@ function buildDiff(inp, ans){
   return html;
 }
 
+// English diff - word level for English
+function buildDiffEn(inp, ans){
+  const inpW=inp.trim().toLowerCase().split(/\s+/).filter(Boolean);
+  const ansW=ans.trim().toLowerCase().split(/\s+/).filter(Boolean);
+  const ansOrig=ans.trim().split(/\s+/).filter(Boolean);
+  // LCS on words
+  const m=inpW.length, n=ansW.length;
+  const dp=Array.from({length:m+1},()=>new Int32Array(n+1));
+  for(let i=1;i<=m;i++) for(let j=1;j<=n;j++)
+    dp[i][j]=inpW[i-1]===ansW[j-1]?dp[i-1][j-1]+1:Math.max(dp[i-1][j],dp[i][j-1]);
+  const pairs=[];
+  let i=m,j=n;
+  while(i>0&&j>0){
+    if(inpW[i-1]===ansW[j-1]){pairs.unshift([i-1,j-1]);i--;j--;}
+    else if(dp[i-1][j]>dp[i][j-1])i--;else j--;
+  }
+  let html='',ai=0,ii=0;
+  for(let pi=0;pi<=pairs.length;pi++){
+    const ae=pi<pairs.length?pairs[pi][1]:n;
+    const ie=pi<pairs.length?pairs[pi][0]:m;
+    while(ai<ae){html+='<span class="ins">'+ansOrig[ai]+'</span> ';ai++;}
+    while(ii<ie){html+='<span class="del">'+inpW[ii]+'</span> ';ii++;}
+    if(pi<pairs.length){html+='<span class="ok-ch">'+ansOrig[pairs[pi][1]]+'</span> ';ai++;ii++;}
+  }
+  return html;
+}
+
 // 정확도: 공백제거 후 글자 단위 LCS 매칭 수 / 정답 글자 수 (캐시 적용)
 const _pctCache=new Map();
 function calcPct(inp, ans){
+  if(lang==='en'){
+    const iw=inp.trim().toLowerCase().split(/\s+/).filter(Boolean);
+    const aw=ans.trim().toLowerCase().split(/\s+/).filter(Boolean);
+    const m=iw.length,n=aw.length;
+    if(n===0) return 0;
+    const dp=Array.from({length:m+1},()=>new Int32Array(n+1));
+    for(let i=1;i<=m;i++) for(let j=1;j<=n;j++)
+      dp[i][j]=iw[i-1]===aw[j-1]?dp[i-1][j-1]+1:Math.max(dp[i-1][j],dp[i][j-1]);
+    return Math.round(dp[m][n]/n*100);
+  }
   const A=inp.replace(/\s/g,''), B=ans.replace(/\s/g,'');
   const key=A+'|'+B;
   if(_pctCache.has(key)) return _pctCache.get(key);
@@ -488,19 +611,128 @@ function calcPct(inp, ans){
 }
 
 function updateBtn(idx){
-  const el=document.getElementById('rbtn'+idx);
-  if(!el) return;
-  const rg=RANGES[idx];
-  const comp=idx===0?done.size:[...done].filter(i=>i>=rg.s&&i<=rg.e).length;
-  el.querySelector('.done-num').textContent=comp;
-  el.querySelector('.try-num').textContent=tries[idx];
+  // update 전체 (idx=0)
+  if(idx===0){
+    const dEl=document.getElementById('rdone0');
+    const tEl=document.getElementById('rtry0');
+    if(dEl) dEl.textContent=done.size;
+    if(tEl) tEl.textContent=tries[0];
+    return;
+  }
+  // update sub buttons
+  GROUPS.forEach((grp,gi)=>{
+    grp.subs.forEach((sub,si)=>{
+      const rIdx=RANGES.findIndex(r=>r.s===sub.s&&r.e===sub.e);
+      const comp=[...done].filter(i=>i>=sub.s&&i<=sub.e).length;
+      const t=tries[rIdx]||0;
+      const dEl=document.getElementById('sdone'+gi+'_'+si);
+      const tEl=document.getElementById('stry'+gi+'_'+si);
+      if(dEl) dEl.textContent=comp;
+      if(tEl) tEl.textContent=t;
+    });
+  });
 }
-function updateAllBtns(){ RANGES.forEach((_,i)=>updateBtn(i)); }
+function updateAllBtns(){ updateBtn(0); updateBtn(1); }
 
 function setMode(m){
   document.body.className=m;
   document.getElementById('lLight').className='ctrl-label'+(m==='light'?' sel':'');
   document.getElementById('lDark').className='ctrl-label'+(m==='dark'?' sel':'');
+  applyGroupBoxStyle();
+}
+
+function setLang(l){
+  lang=l;
+  document.getElementById('lblKo').className='ctrl-label'+(l==='ko'?' sel':'');
+  document.getElementById('lblEn').className='ctrl-label'+(l==='en'?' sel':'');
+  // 언어 변경 시 입력칸 힌트 및 구절 보기 업데이트
+  V.forEach((_,i)=>{
+    const inp=document.getElementById('inp'+i);
+    const rv=document.getElementById('rv'+i);
+    if(inp && !inp.classList.contains('correct') && !inp.classList.contains('wrong')){
+      inp.value='';
+    }
+    if(rv){
+      const cv=currentV()[i];
+      rv.innerHTML='<strong>'+cv.r+'</strong> '+cv.t;
+    }
+  });
+  const isEn=l==='en';
+
+  // tip 예시
+  const tip=document.querySelector('.tip');
+  if(tip){
+    if(isEn) tip.innerHTML='Input reference + verse e.g. <b>Ephesians 4:13 until we all attain...</b> &nbsp;|&nbsp; Enter or ✓ to check &nbsp;|&nbsp; punctuation ignored';
+    else tip.innerHTML='구절+본문 입력 예) <b>에베소서 4:13 우리가 다 하나님의...</b> &nbsp;|&nbsp; 엔터 또는 확인으로 채점 &nbsp;|&nbsp; 띄어쓰기 무시';
+  }
+
+  // 제목
+  const h1=document.querySelector('h1');
+  if(h1) h1.textContent=isEn?'NCBC Disciple Bible Memory Verses':'NCBC 제자반 성경암송 구절';
+
+  // 전체보기 / 전체닫기 버튼
+  const gEye=document.getElementById('globalEye');
+  if(gEye){
+    const isOn=globalRevealOn;
+    gEye.innerHTML=(isOn?eyeOff:eyeOn)+(isOn?(isEn?' Hide All':' 전체 닫기'):(isEn?' Show All':' 전체 보기'));
+  }
+
+  // 다시쓰기 버튼
+  const resetB=document.getElementById('resetBtn');
+  if(resetB) resetB.innerHTML=resetB.innerHTML.replace('다시 쓰기','Reset').replace('Reset',isEn?'Reset':'다시 쓰기');
+
+  // 순서/권별/랜덤/개별
+  const modeLabels={lSeq:['순서','Order'],lBook:['권별','By Book'],lRand:['랜덤','Random'],lSearch:['개별','Search']};
+  Object.entries(modeLabels).forEach(([id,[ko,en]])=>{
+    const el=document.getElementById(id); if(el) el.textContent=isEn?en:ko;
+  });
+
+  // 그룹 이름
+  const groupNames={grpBtn0:['전체','All'],grpBtn1:['디사이플','Disciple'],grpBtn2:['둘로스','Doulos'],grpBtn3:['포이맨','Poimen']};
+  Object.entries(groupNames).forEach(([id,[ko,en]])=>{
+    const el=document.getElementById(id);
+    if(!el) return;
+    // 전체 버튼
+    if(id==='grpBtn0'){
+      const rt=el.querySelector('.rtop'); if(rt) rt.textContent=isEn?en:ko;
+    } else {
+      // 박스 라벨
+      const lbl=el.querySelector('span:first-child'); if(lbl) lbl.textContent=isEn?en:ko;
+    }
+  });
+
+  // placeholder + 확인 버튼 업데이트
+  V.forEach((_,i)=>{
+    const inp=document.getElementById('inp'+i);
+    if(inp&&!inp.classList.contains('correct')&&!inp.classList.contains('wrong')){
+      inp.placeholder=isEn?'Enter reference + verse...':'구절과 본문 입력...';
+    }
+    const vbtn=document.querySelector('#row'+i+' .vbtn');
+    if(vbtn) vbtn.textContent='✓';
+  });
+
+  // 검색창 placeholder
+  const si=document.getElementById('searchInp');
+  if(si) si.placeholder=isEn?'Search reference or verse... (e.g. John 3:16, love)':'장절 또는 본문 검색... (예: 마태복음 6:33, 예레미야, 두려워)';
+
+  // 약점 버튼
+  const wb=document.getElementById('weakBtn');
+  if(wb&&wb.style.display!=='none'){
+    const cnt=wb.textContent.match(/\d+/)?.[0]||'0';
+    wb.textContent=isEn?'⚠️ Weak':('⚠️ 약점 '+cnt+'개');
+  }
+
+  // ✓완료 ↺시도 범례
+  const legend=document.querySelector('[style*="완료"]');
+  // handled by HTML entity, skip
+
+  // 로그인 버튼
+  const authBtn=document.getElementById('fbAuthBtn');
+  if(authBtn){
+    const isLoggedIn=authBtn.textContent.includes('로그아웃')||authBtn.textContent.includes('Logout');
+    if(isLoggedIn) authBtn.innerHTML=(isEn?'Logout':'로그아웃');
+    else authBtn.innerHTML=(isEn?'<svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> Google Login':'<svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> 구글 로그인');
+  }
 }
 
 function shuffle(arr){ for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];}return arr; }
@@ -733,14 +965,82 @@ function clearBookHeaders(){
   document.querySelectorAll('.book-header').forEach(el=>el.remove());
 }
 
-function setRange(idx){
-  curRange=idx;
-  RANGES.forEach((_,i)=>{ document.getElementById('rbtn'+i).className='rbtn'+(i===idx?' sel':''); });
-  const rg=RANGES[idx];
+function setRangeByGroup(gi){
+  // 전체 버튼
+  const allBtn=document.getElementById('grpBtn0');
+  if(allBtn) allBtn.className='rbtn'+(gi===0?' sel':'');
+  // 박스 그룹 active 표시
+  GROUPS.slice(1).forEach((_,i)=>{
+    const box=document.getElementById('grpBtn'+(i+1));
+    if(box){ box.classList.toggle('active', gi===i+1); }
+  });
+  // 세부 버튼 sel 해제
+  GROUPS.forEach((g,i)=>g.subs.forEach((_,si)=>{ const b=document.getElementById('subBtn'+i+'_'+si); if(b) b.className='rbtn'; }));
+  curS=GROUPS[gi].s; curE=GROUPS[gi].e;
+  curRange=gi;
+  applyGroupBoxStyle();
+  applyRangeFilter(curS, curE);
+}
+
+function setRangeBySub(s, e, gi, si){
+  // 전체 버튼 해제
+  const allBtn=document.getElementById('grpBtn0'); if(allBtn) allBtn.className='rbtn';
+  // 모든 박스 active 해제 후 해당 박스 active
+  GROUPS.slice(1).forEach((_,i)=>{ const box=document.getElementById('grpBtn'+(i+1)); if(box) box.classList.remove('active'); });
+  const box=document.getElementById('grpBtn'+gi); if(box) box.classList.add('active');
+  // 세부 버튼 sel
+  GROUPS.forEach((g,i)=>g.subs.forEach((_,sj)=>{ const b=document.getElementById('subBtn'+i+'_'+sj); if(b) b.className='rbtn'; }));
+  const sb=document.getElementById('subBtn'+gi+'_'+si); if(sb) sb.className='rbtn sel';
+  curS=s; curE=e;
+  curRange=RANGES.findIndex(r=>r.s===s&&r.e===e)||0;
+  applyGroupBoxStyle();
+  applyRangeFilter(s, e);
+}
+
+function applyRangeFilter(s, e){
   const list=document.getElementById('list');
   clearBookHeaders();
+  let indices=[];
+  V.forEach((_,i)=>{
+    const row=document.getElementById('row'+i);
+    if(!row) return;
+    const inRange=(i>=s&&i<=e);
+    row.classList.toggle('hidden',!inRange);
+    if(inRange) indices.push(i);
+  });
 
-  // collect indices in range
+  if(sortMode==='rand'){
+    shuffle(indices);
+    indices.forEach(i=>list.appendChild(document.getElementById('row'+i)));
+  } else if(sortMode==='book'){
+    const bookMap={};
+    indices.forEach(i=>{ const b=bookOf(V[i].r); if(!bookMap[b]) bookMap[b]=[]; bookMap[b].push(i); });
+    let books=Object.keys(bookMap);
+    if(bookSortMode==='bible'){
+      books.sort((a,b)=>{ const ai=BIBLE_ORDER.indexOf(a),bi=BIBLE_ORDER.indexOf(b); return (ai===-1?999:ai)-(bi===-1?999:bi); });
+    } else {
+      books.sort((a,b)=>{ const d=bookMap[b].length-bookMap[a].length; return d!==0?d:bookMap[a][0]-bookMap[b][0]; });
+    }
+    books.forEach(book=>{
+      const hdr=document.createElement('div'); hdr.className='book-header show';
+      hdr.textContent=book+' ('+bookMap[book].length+'개)'; list.appendChild(hdr);
+      [...bookMap[book]].sort((a,b)=>{ const pa=parseRef(V[a].r),pb=parseRef(V[b].r); return pa.ch!==pb.ch?pa.ch-pb.ch:pa.vs-pb.vs; })
+        .forEach(i=>list.appendChild(document.getElementById('row'+i)));
+    });
+  } else {
+    indices.sort((a,b)=>a-b);
+    indices.forEach(i=>list.appendChild(document.getElementById('row'+i)));
+  }
+}
+
+function setRange(idx){
+  curRange=idx;
+  RANGES.forEach((_,i)=>{ document.getElementById('rbtn'+i)&&(document.getElementById('rbtn'+i).className='rbtn'+(i===idx?' sel':'')); });
+  const rg=RANGES[idx];
+  applyRangeFilter(rg.s, rg.e);
+  return; // applyRangeFilter handles everything
+  const list=document.getElementById('list');
+  clearBookHeaders();
   let indices=[];
   V.forEach((_,i)=>{
     const row=document.getElementById('row'+i);
@@ -801,7 +1101,7 @@ function toggleAllReveal(){
   globalRevealOn=!globalRevealOn;
   const btn=document.getElementById('globalEye');
   btn.classList.toggle('on',globalRevealOn);
-  btn.innerHTML=(globalRevealOn?eyeOff:eyeOn)+(globalRevealOn?' 전체 닫기':' 전체 보기');
+  btn.innerHTML=(globalRevealOn?eyeOff:eyeOn)+(globalRevealOn?(lang==='en'?' Hide All':' 전체 닫기'):(lang==='en'?' Show All':' 전체 보기'));
   V.forEach((_,i)=>setReveal(i,globalRevealOn));
 }
 function setReveal(i,on){
@@ -857,15 +1157,18 @@ function check(i){
   if(expanded!==inp.value) inp.value=expanded;
   const val=inp.value;
   if(!val.trim()) return;
-  const ans=full(V[i]);
+  const ans=currentFull(i);
 
   tries[0]++;
   tries[groupOf(i)]++;
   updateAllBtns();
 
-  if(calcPct(val,ans)===100){
+  const isPass = lang==='en'
+    ? val.trim().toLowerCase().replace(/[.,;!?]/g,'')===ans.trim().toLowerCase().replace(/[.,;!?]/g,'')
+    : calcPct(val,ans)===100;
+  if(isPass){
     inp.classList.remove('wrong'); inp.classList.add('correct');
-    st.className='vstatus ok'; st.textContent='정답';
+    st.className='vstatus ok'; st.textContent=lang==='en'?'Correct':'정답';
     // 정답일 때도 전체 구절 보여주기
     fb.className='vfeedback show';
     fb.style.color='';
@@ -880,9 +1183,9 @@ function check(i){
     st.className='vstatus ng';
     // 정확도: 동일한 슬라이싱 방식으로 계산
     const pct=calcPct(val,ans);
-    st.textContent='정확도 '+pct+'%';
+    st.textContent=(lang==='en'?'Accuracy ':'정확도 ')+pct+'%';
     fb.className='vfeedback show';
-    fb.innerHTML=buildDiff(val,ans);
+    fb.innerHTML=lang==='en'?buildDiffEn(val,ans):buildDiff(val,ans);
     // Firebase에 오답 저장
     if(window._fbSaveStats) window._fbSaveStats(i, false);
   }
@@ -907,7 +1210,7 @@ window._fbApplyStats = function(stats){
   if(btn){
     if(weakCount>0){
       btn.style.display='inline-block';
-      btn.textContent='⚠️ 약점 '+weakCount+'개';
+      btn.textContent=lang==='en'?'⚠️ Weak':('⚠️ 약점 '+weakCount+'개');
     } else {
       btn.style.display='none';
     }
@@ -971,7 +1274,7 @@ function toggleMic(i){
   const inp=document.getElementById('inp'+i);
   const btn=document.getElementById('mic'+i);
   const rec=new SpeechRecognition();
-  rec.lang='ko-KR';
+  rec.lang=lang==='en'?'en-US':'ko-KR';
   rec.continuous=true;      // 연속 인식 — 말 중간에 끊기지 않음
   rec.interimResults=true;
   rec.maxAlternatives=3;    // 여러 후보 중 가장 정확한 것 선택
@@ -984,14 +1287,14 @@ function toggleMic(i){
     btn.classList.remove('listening');
     btn.classList.add('ready');
     btn.innerHTML=micReadySVG;
-    btn.title='준비 중... 곧 말씀하세요';
+    btn.title=lang==='en'?'Getting ready... speak soon':'준비 중... 곧 말씀하세요';
     // 0.7초 후 → 녹음 중 상태 (X 마이크 + 빠른 맥박)
     setTimeout(()=>{
       if(btn.classList.contains('ready')){
         btn.classList.remove('ready');
         btn.classList.add('listening');
         btn.innerHTML=micOffSVG;
-        btn.title='녹음 중... 지금 말씀하세요';
+        btn.title=lang==='en'?'Recording... speak now':'녹음 중... 지금 말씀하세요';
       }
     }, 700);
   };
@@ -1030,7 +1333,7 @@ function toggleMic(i){
       else interimText+=best;
     }
     const raw=finalText||interimText;
-    inp.value=convertSpeechToText(raw);
+    inp.value=lang==='en'?raw.trim():convertSpeechToText(raw);
 
     // 음성 감지될 때마다 타이머 리셋 (4초 침묵 후 자동 종료)
     if(silenceTimer) clearTimeout(silenceTimer);
@@ -1043,7 +1346,7 @@ function toggleMic(i){
     if(silenceTimer) clearTimeout(silenceTimer);
     btn.classList.remove('listening','ready');
     btn.innerHTML=micSVG;
-    btn.title='음성 입력';
+    btn.title=lang==='en'?'Voice input':'음성 입력';
     activeRecognition=null;
     activeMicIdx=-1;
     if(inp.value.trim()) check(i);
@@ -1187,19 +1490,80 @@ function applyWeakFilter(){
 
 function buildRangeBar(){
   const bar=document.getElementById('rangeBar');
-  RANGES.forEach((rg,idx)=>{
-    const btn=document.createElement('span');
-    btn.className='rbtn'+(idx===0?' sel':'');
-    btn.id='rbtn'+idx;
-    btn.onclick=()=>setRange(idx);
-    btn.innerHTML=
-      '<span class="rtop">'+rg.label+'</span>'+
-      '<span class="rbot">'+
-        '<span class="done-num">0</span> ✓'+
-        '<span class="sep">|</span>'+
-        '<span class="try-num">0</span> ↺'+
-      '</span>';
-    bar.appendChild(btn);
+  bar.innerHTML='';
+
+  // 전체 버튼 (단독)
+  const allBtn=document.createElement('span');
+  allBtn.className='rbtn sel';
+  allBtn.id='grpBtn0';
+  allBtn.style.cssText='align-self:center;';
+  allBtn.onclick=()=>setRangeByGroup(0);
+  allBtn.innerHTML=
+    '<span class="rtop">전체</span>'+
+    '<span class="rbot"><span class="done-num" id="rdone0">0</span> ✓<span class="sep">|</span><span class="try-num" id="rtry0">0</span> ↺</span>';
+  bar.appendChild(allBtn);
+
+  // 반별 그룹 (테두리 박스)
+  GROUPS.slice(1).forEach((grp,gi)=>{
+    const realGi=gi+1;
+    const box=document.createElement('div');
+    box.id='grpBtn'+realGi;
+    box.style.cssText='position:relative;border:1.5px solid;border-radius:10px;padding:4px;cursor:pointer;transition:all .12s;';
+    // 반 이름 라벨 (테두리 상단 중앙)
+    const lbl=document.createElement('span');
+    lbl.style.cssText='position:absolute;top:-9px;left:50%;transform:translateX(-50%);font-size:11px;font-weight:600;padding:0 6px;white-space:nowrap;border-radius:4px;cursor:pointer;z-index:1;';
+    lbl.textContent=grp.name;
+    lbl.onclick=(e)=>{ e.stopPropagation(); setRangeByGroup(realGi); };
+    box.appendChild(lbl);
+    // 테두리 박스 클릭 → 반 전체 표시
+    box.onclick=(e)=>{
+      if(e.target.closest('.rbtn')) return;
+      setRangeByGroup(realGi);
+    };
+    // 세부 구간 버튼들
+    const subRow=document.createElement('div');
+    subRow.style.cssText='display:flex;gap:3px;margin-top:4px;';
+    grp.subs.forEach((sub,si)=>{
+      const sb=document.createElement('span');
+      sb.className='rbtn';
+      sb.id='subBtn'+realGi+'_'+si;
+      sb.style.cssText='flex:1;text-align:center;min-width:52px;';
+      sb.onclick=(e)=>{ e.stopPropagation(); setRangeBySub(sub.s,sub.e,realGi,si); };
+      sb.innerHTML=
+        '<span class="rtop" style="font-size:11px;">'+sub.label+'</span>'+
+        '<span class="rbot">'+
+          '<span class="done-num" id="sdone'+realGi+'_'+si+'">0</span> ✓'+
+          '<span class="sep">|</span>'+
+          '<span class="try-num" id="stry'+realGi+'_'+si+'">0</span> ↺'+
+        '</span>';
+      subRow.appendChild(sb);
+    });
+    box.appendChild(subRow);
+    bar.appendChild(box);
+  });
+  // 초기 스타일 적용
+  applyGroupBoxStyle();
+}
+
+function applyGroupBoxStyle(){
+  const isDark=document.body.classList.contains('dark');
+  const selColor=isDark?'#e0e0da':'#1a1a1a';
+  const defColor=isDark?'#444':'#d0d0c8';
+  const bgSel=isDark?'#2a2a2a':'#fff';
+  const bgDef='transparent';
+  const lblBg=isDark?'#181818':'#f5f5f0';
+
+  GROUPS.slice(1).forEach((grp,gi)=>{
+    const realGi=gi+1;
+    const box=document.getElementById('grpBtn'+realGi);
+    if(!box) return;
+    const isActive=box.classList.contains('active');
+    box.style.borderColor=isActive?selColor:defColor;
+    const lbl=box.querySelector('span');
+    if(lbl){
+      lbl.style.color=isActive?selColor:(isDark?'#888':'#999');
+      lbl.style.background=lblBg;
+    }
   });
 }
 
@@ -1213,14 +1577,14 @@ function buildRows(){
       '<div class="verse-header">'+
         '<span class="vnum" id="vnum'+i+'">'+(i+1)+'</span>'+
         '<input class="vinput" id="inp'+i+'" type="text" placeholder="구절과 본문 입력..." />'+
-        '<button class="vbtn" onclick="check('+i+')">확인</button>'+
+        '<button class="vbtn" onclick="check('+i+')">✓</button>'+
         '<button class="eyebtn" id="eb'+i+'" onclick="toggleReveal('+i+')">'+eyeOn+'</button>'+
         '<button class="eyebtn" onclick="resetRow('+i+')" title="이 칸 초기화">'+resetSVG+'</button>'+
         '<button class="micbtn" id="mic'+i+'" onclick="toggleMic('+i+')" title="음성 입력">'+micSVG+'</button>'+
         '<span class="vstatus" id="st'+i+'"></span>'+
       '</div>'+
       '<div class="vfeedback" id="fb'+i+'"></div>'+
-      '<div class="vrevealed" id="rv'+i+'"><strong>'+v.r+'</strong>'+v.t+'</div>';
+      '<div class="vrevealed" id="rv'+i+'"><strong>'+v.r+'</strong> '+v.t+'</div>';
     list.appendChild(row);
     (function(rowIdx){
       const el=document.getElementById('inp'+rowIdx);
@@ -1253,7 +1617,7 @@ function buildRows(){
 
 buildRangeBar();
 buildRows();
-setRange(0);
+setRangeByGroup(0);
 </script>
 </body>
 </html>
