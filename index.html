@@ -89,7 +89,7 @@ onAuthStateChanged(auth, async (user) => {
 });
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NCBC 제자반 성경암송 구절</title>
+<title>제자반 성경암송 구절</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Malgun Gothic',sans-serif;padding:1.5rem;}
@@ -303,7 +303,7 @@ body.dark .book-header{color:#e0e0da;}
     </div>
   </div>
   <div class="top">
-    <h1>NCBC 제자반 성경암송 구절</h1>
+    <h1>제자반 성경암송 구절</h1>
     <div class="ctrl-bar" style="padding:2px;gap:2px;">
       <input type="radio" name="mode" id="mLight" class="ctrl-radio" checked>
       <label for="mLight" class="ctrl-label sel" id="lLight" onclick="setMode('light')" style="font-size:11px;padding:3px 10px;">라이트</label>
@@ -685,7 +685,7 @@ function setLang(l){
 
   // 제목
   const h1=document.querySelector('h1');
-  if(h1) h1.textContent=isEn?'NCBC Disciple Bible Memory Verses':'NCBC 제자반 성경암송 구절';
+  if(h1) h1.textContent=isEn?'Discipleship Training Bible Verse Memorization':'제자반 성경암송 구절';
 
   // 전체보기 / 전체닫기 버튼
   const gEye=document.getElementById('globalEye');
