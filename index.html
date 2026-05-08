@@ -107,9 +107,16 @@ body.light .eyebtn.on{background:#E6F1FB;color:#185FA5;border-color:#85B7EB;}
 body.light .vnum{color:#999;}
 body.light .vfeedback{border-top-color:#f0f0ec;}
 body.light .vrevealed{background:#f9f6ee;border-top-color:#e8e0c8;color:#3a3020;}
+body.light #langToggle{background:#e8e8e2;border:none;}
+body.light #langToggle #lblKo,body.light #langToggle #lblEn{color:#666;}
+body.light #langToggle .lang-sel{background:#fff;color:#1a1a1a;box-shadow:0 1px 6px rgba(0,0,0,.15);}
+body.dark #langToggle{background:#2a2a2a;border:none;}
+body.dark #langToggle #lblKo,body.dark #langToggle #lblEn{color:#777;}
+body.dark #langToggle .lang-sel{background:#444;color:#e0e0da;box-shadow:0 1px 6px rgba(0,0,0,.3);}
 body.light .ctrl-bar{background:#e8e8e2;border-color:#d0d0c8;}
-body.light .ctrl-label{color:#666;}
-body.light .ctrl-label.sel{background:#fff;color:#1a1a1a;box-shadow:0 1px 3px rgba(0,0,0,.1);}
+body.light .ctrl-label{color:#555;background:rgba(0,0,0,.07);}
+body.light .ctrl-label:hover{background:rgba(0,0,0,.13);color:#1a1a1a;}
+body.light .ctrl-label.sel{background:#fff;color:#1a1a1a;font-weight:700;box-shadow:0 2px 8px rgba(0,0,0,.15);border:1px solid rgba(0,0,0,.1);}
 body.light h1{color:#1a1a1a;}
 body.light .del{background:#FCEBEB;color:#c0392b;text-decoration:line-through;border-radius:3px;padding:0 3px;}
 body.light .ins{background:#E1F5EE;color:#0F6E56;border-radius:3px;padding:0 3px;font-weight:500;}
@@ -120,13 +127,15 @@ body.light .global-eye{background:#fff;color:#555;border-color:#ccc;}
 body.light .global-eye:hover{background:#f0f0ec;}
 body.light .global-eye.on{background:#E6F1FB;color:#185FA5;border-color:#85B7EB;}
 body.light .range-bar{background:#e8e8e2;border-color:#d0d0c8;}
-body.light .rbtn{color:#666;border-color:transparent;}
-body.light .rbtn:hover{background:rgba(0,0,0,.06);}
-body.light .rbtn.sel{background:#fff;color:#1a1a1a;box-shadow:0 1px 3px rgba(0,0,0,.1);}
-body.light .rbtn .rbot{color:rgba(0,0,0,.38);}
-body.light .rbtn.sel .rbot{color:rgba(0,0,0,.5);}
+body.light .rbtn{color:#555;border-color:transparent;background:rgba(0,0,0,.07);}
+body.light .rbtn:hover{background:rgba(0,0,0,.13);color:#1a1a1a;}
+body.light .rbtn.sel{background:#fff;color:#1a1a1a;font-weight:700;box-shadow:0 2px 8px rgba(0,0,0,.15);border:1px solid rgba(0,0,0,.1);}
+body.light .rbtn .rbot{color:rgba(0,0,0,.4);}
+body.light .rbtn.sel .rbot{color:rgba(0,0,0,.6);}
+body.light .rbtn.sel .rbot .done-num{color:#1D9E75;font-weight:700;}
+body.light .rbtn.sel .rbot .sep{opacity:.5;}
 body.light .rbtn .rbot .done-num{color:#1D9E75;}
-body.light .rbtn .rbot .try-num{color:rgba(0,0,0,.45);}
+body.light .rbtn .rbot .try-num{color:rgba(0,0,0,.4);}
 
 body.dark{background:#181818;color:#e0e0da;}
 body.dark .verse-row{background:#222;border-color:#333;}
@@ -149,19 +158,22 @@ body.dark .ins{background:#0b2d1e;color:#5DCAA5;border-radius:3px;padding:0 3px;
 body.dark .ok-ch{color:#e0e0da;}
 body.dark h1{color:#e0e0da;}
 body.dark .ctrl-bar{background:#222;border-color:#333;}
-body.dark .ctrl-label{color:#666;}
-body.dark .ctrl-label.sel{background:#333;color:#e0e0da;}
+body.dark .ctrl-label{color:#aaa;background:rgba(255,255,255,.08);}
+body.dark .ctrl-label:hover{background:rgba(255,255,255,.15);color:#e0e0da;}
+body.dark .ctrl-label.sel{background:#3a3a3a;color:#e0e0da;font-weight:700;box-shadow:0 2px 8px rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.12);}
 body.dark .tip{background:#222;color:#777;}
 body.dark .tip b{color:#aaa;}
 body.dark .global-eye{background:#2a2a2a;color:#888;border-color:#3a3a3a;}
 body.dark .global-eye:hover{background:#333;}
 body.dark .global-eye.on{background:#0c2a42;color:#85B7EB;border-color:#185FA5;}
 body.dark .range-bar{background:#222;border-color:#333;}
-body.dark .rbtn{color:#666;border-color:transparent;}
-body.dark .rbtn:hover{background:rgba(255,255,255,.06);}
-body.dark .rbtn.sel{background:#333;color:#e0e0da;}
-body.dark .rbtn .rbot{color:rgba(255,255,255,.28);}
-body.dark .rbtn.sel .rbot{color:rgba(255,255,255,.45);}
+body.dark .rbtn{color:#aaa;border-color:transparent;background:rgba(255,255,255,.08);}
+body.dark .rbtn:hover{background:rgba(255,255,255,.15);color:#e0e0da;}
+body.dark .rbtn.sel{background:#3a3a3a;color:#e0e0da;font-weight:700;box-shadow:0 2px 8px rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.12);}
+body.dark .rbtn .rbot{color:rgba(255,255,255,.35);}
+body.dark .rbtn.sel .rbot{color:rgba(255,255,255,.7);}
+body.dark .rbtn.sel .rbot .done-num{color:#5DCAA5;font-weight:700;}
+body.dark .rbtn.sel .rbot .sep{opacity:.5;}
 body.dark .rbtn .rbot .done-num{color:#5DCAA5;}
 body.dark .rbtn .rbot .try-num{color:rgba(255,255,255,.35);}
 
@@ -169,10 +181,10 @@ body.dark .rbtn .rbot .try-num{color:rgba(255,255,255,.35);}
 .topbar{display:flex;align-items:center;gap:8px;margin-bottom:1rem;flex-wrap:wrap;}
 .ctrl-bar{display:inline-flex;align-items:center;gap:4px;padding:4px;border-radius:10px;border:1px solid;}
 .ctrl-radio{display:none;}
-.ctrl-label{font-size:13px;cursor:pointer;padding:5px 14px;border-radius:7px;transition:background .12s;user-select:none;}
+.ctrl-label{font-size:13px;cursor:pointer;padding:5px 14px;border-radius:7px;transition:all .15s;user-select:none;border:1px solid transparent;}
 .global-eye{font-size:13px;cursor:pointer;padding:5px 12px;border-radius:7px;border:1px solid;transition:background .12s;display:inline-flex;align-items:center;gap:5px;user-select:none;}
 .range-bar{display:flex;align-items:center;gap:4px;padding:4px;border-radius:10px;border:1px solid;margin-bottom:1.2rem;flex-wrap:wrap;}
-.rbtn{display:inline-flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;padding:5px 11px;border-radius:7px;border:1px solid transparent;transition:background .12s;user-select:none;min-width:52px;}
+.rbtn{display:inline-flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;padding:5px 11px;border-radius:7px;border:1px solid transparent;transition:all .15s;user-select:none;min-width:52px;font-weight:400;}
 .rbtn .rtop{font-size:13px;font-weight:500;line-height:1.4;}
 .rbtn .rbot{font-size:11px;line-height:1.4;margin-top:1px;display:flex;gap:5px;align-items:center;}
 .rbtn .rbot .done-num{font-weight:600;}
@@ -235,11 +247,9 @@ body.dark .book-header{color:#e0e0da;}
 <body class="light">
 <div id="wrap">
   <div class="topbar">
-    <div class="ctrl-bar">
-      <input type="radio" name="lang" id="lKo" class="ctrl-radio" checked>
-      <label for="lKo" class="ctrl-label sel" id="lblKo" onclick="setLang('ko')">한국어</label>
-      <input type="radio" name="lang" id="lEn" class="ctrl-radio">
-      <label for="lEn" class="ctrl-label" id="lblEn" onclick="setLang('en')">English</label>
+    <div id="langToggle" style="display:inline-flex;align-items:center;gap:0;border-radius:20px;border:none;padding:3px;transition:all .2s;position:relative;min-width:130px;">
+      <span id="lblKo" onclick="setLang('ko')" style="flex:1;text-align:center;font-size:12px;font-weight:600;padding:4px 14px;border-radius:16px;transition:all .2s;cursor:pointer;">한국어</span>
+      <span id="lblEn" onclick="setLang('en')" style="flex:1;text-align:center;font-size:12px;font-weight:600;padding:4px 14px;border-radius:16px;transition:all .2s;cursor:pointer;">English</span>
     </div>
     <div class="ctrl-bar">
       <input type="radio" name="rmode" id="rmSeq" class="ctrl-radio" checked>
@@ -259,7 +269,7 @@ body.dark .book-header{color:#e0e0da;}
       <svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
       다시 쓰기
     </button>
-    <div style="display:flex;align-items:center;gap:6px;margin-left:8px;">
+    <div style="display:flex;align-items:center;gap:6px;">
       <span id="fbUserInfo" style="font-size:12px;opacity:.6;display:none;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>
       <button id="fbAuthBtn" class="global-eye" onclick="window._fbSignIn()" title="구글 계정으로 로그인하면 학습 기록이 저장됩니다">
         <svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
@@ -641,10 +651,17 @@ function setMode(m){
   applyGroupBoxStyle();
 }
 
+function applyLangToggleStyle(){
+  const isEn=lang==='en';
+  const ko=document.getElementById('lblKo');
+  const en=document.getElementById('lblEn');
+  if(ko) ko.className=isEn?'':'lang-sel';
+  if(en) en.className=isEn?'lang-sel':'';
+}
+
 function setLang(l){
   lang=l;
-  document.getElementById('lblKo').className='ctrl-label'+(l==='ko'?' sel':'');
-  document.getElementById('lblEn').className='ctrl-label'+(l==='en'?' sel':'');
+  applyLangToggleStyle();
   // 언어 변경 시 입력칸 힌트 및 구절 보기 업데이트
   V.forEach((_,i)=>{
     const inp=document.getElementById('inp'+i);
@@ -1618,6 +1635,7 @@ function buildRows(){
 buildRangeBar();
 buildRows();
 setRangeByGroup(0);
+applyLangToggleStyle();
 </script>
 </body>
 </html>
