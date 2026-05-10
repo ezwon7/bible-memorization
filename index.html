@@ -278,12 +278,8 @@ body.dark .book-header{color:#e0e0da;}
     </div>
   </div>
 
-  <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:1.2rem;">
-    <div id="rangeBar" style="display:flex;align-items:flex-start;gap:6px;flex-wrap:wrap;flex:1;"></div>
-    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0;">
-      <span style="font-size:11px;white-space:nowrap;opacity:.5;">&#x2713;&nbsp;완료&nbsp;&#x21BA;&nbsp;시도</span>
-      <button id="weakBtn" onclick="toggleWeak()" style="display:none;font-size:12px;font-weight:500;padding:5px 14px;border-radius:20px;border:1.5px solid #E24B4A;color:#E24B4A;background:transparent;cursor:pointer;white-space:nowrap;font-family:inherit;">⚠️ 약점 0개</button>
-    </div>
+  <div style="margin-bottom:1.2rem;">
+    <div id="rangeBar" style="display:flex;align-items:flex-start;gap:6px;flex-wrap:wrap;"></div>
   </div>
 
   <div id="searchBar" style="display:none;margin-bottom:1.2rem;">
@@ -303,12 +299,16 @@ body.dark .book-header{color:#e0e0da;}
     </div>
   </div>
   <div class="top">
-    <h1>제자반 성경암송 구절</h1>
-    <div class="ctrl-bar" style="padding:2px;gap:2px;">
-      <input type="radio" name="mode" id="mLight" class="ctrl-radio" checked>
-      <label for="mLight" class="ctrl-label sel" id="lLight" onclick="setMode('light')" style="font-size:11px;padding:3px 10px;">라이트</label>
-      <input type="radio" name="mode" id="mDark" class="ctrl-radio">
-      <label for="mDark" class="ctrl-label" id="lDark" onclick="setMode('dark')" style="font-size:11px;padding:3px 10px;">다크</label>
+    <h1 id="mainTitle">제자반 성경암송 구절</h1>
+    <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+      <span style="font-size:11px;white-space:nowrap;opacity:.45;">&#x2713;&nbsp;완료&nbsp;&#x21BA;&nbsp;시도</span>
+      <button id="weakBtn" onclick="toggleWeak()" style="display:none;font-size:12px;font-weight:500;padding:4px 12px;border-radius:20px;border:1.5px solid #E24B4A;color:#E24B4A;background:transparent;cursor:pointer;white-space:nowrap;font-family:inherit;">⚠️ 약점 0개</button>
+      <div class="ctrl-bar" style="padding:2px;gap:2px;">
+        <input type="radio" name="mode" id="mLight" class="ctrl-radio" checked>
+        <label for="mLight" class="ctrl-label sel" id="lLight" onclick="setMode('light')" style="font-size:11px;padding:3px 10px;">라이트</label>
+        <input type="radio" name="mode" id="mDark" class="ctrl-radio">
+        <label for="mDark" class="ctrl-label" id="lDark" onclick="setMode('dark')" style="font-size:11px;padding:3px 10px;">다크</label>
+      </div>
     </div>
   </div>
   <div class="tip">구절+본문 입력 예) <b>에베소서 4:13 우리가 다 하나님의...</b> &nbsp;|&nbsp; 엔터 또는 확인으로 채점 &nbsp;|&nbsp; 띄어쓰기 무시</div>
@@ -684,7 +684,7 @@ function setLang(l){
   }
 
   // 제목
-  const h1=document.querySelector('h1');
+  const h1=document.getElementById('mainTitle');
   if(h1) h1.textContent=isEn?'Discipleship Training Bible Verse Memorization':'제자반 성경암송 구절';
 
   // 전체보기 / 전체닫기 버튼
