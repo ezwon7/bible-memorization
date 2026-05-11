@@ -1177,8 +1177,8 @@ function check(i){
   updateAllBtns();
 
   const isPass = lang==='en'
-    ? val.trim().toLowerCase().replace(/[.,;!?]/g,'')===ans.trim().toLowerCase().replace(/[.,;!?]/g,'')
-    : calcPct(val,ans)===100;
+    ? val.trim().toLowerCase().replace(/[.,;!?]/g,'').replace(/\s+/g,' ')===ans.trim().toLowerCase().replace(/[.,;!?]/g,'').replace(/\s+/g,' ')
+    : val.replace(/\s/g,'')===ans.replace(/\s/g,'');
   if(isPass){
     inp.classList.remove('wrong'); inp.classList.add('correct');
     st.className='vstatus ok'; st.textContent=lang==='en'?'Correct':'정답';
